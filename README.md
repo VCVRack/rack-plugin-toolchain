@@ -32,3 +32,8 @@ make plugin-build PLUGIN_DIR=...
 ```
 
 This places packages in `plugin-build/`.
+
+
+## Acknowledgments
+
+Thanks to @cschol for help with crosstool-ng, Ubuntu, Docker, and testing.
