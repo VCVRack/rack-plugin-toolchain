@@ -59,6 +59,7 @@ $(toolchain-mac):
 	# Build osxcross
 	cp MacOSX10.13.sdk.tar.bz2 $@/tarballs/
 	cd $@ && UNATTENDED=1 TARGET_DIR="$(LOCAL_DIR)/osxcross" ./build.sh
+	rm -rf osxcross
 
 
 rack-sdk := Rack-SDK
@@ -83,7 +84,7 @@ toolchain-clean:
 PLUGIN_BUILD_DIR := plugin-build
 
 
-plugin-build-mac: export PATH := $(PWD)/osxcross/target/bin:$(PATH)
+plugin-build-mac: export PATH := $(LOCAL_DIR)/osxcross/bin:$(PATH)
 plugin-build-mac: export CC := x86_64-apple-darwin17-clang
 plugin-build-mac: export CXX := x86_64-apple-darwin17-clang++-libc++
 plugin-build-mac: export STRIP := x86_64-apple-darwin17-strip
