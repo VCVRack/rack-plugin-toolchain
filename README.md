@@ -16,7 +16,8 @@ make toolchain-linux
 make toolchain-windows
 make toolchain-mac
 ```
-Each toolchain will take around an hour to build, requiring network access and about 15 GB free disk space total.
+Each toolchain will take around an hour to build, requiring network access and about 15 GB free disk space.
+The final disk space after building is about 1.6 GB.
 
 Download the latest Rack SDK.
 ```
