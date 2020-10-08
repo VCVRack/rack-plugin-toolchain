@@ -1,3 +1,6 @@
+.NOTPARALLEL:
+.PHONY: all plugin-build
+
 
 # Installation path for executables
 LOCAL_DIR := $(PWD)/local
@@ -5,7 +8,10 @@ LOCAL_DIR := $(PWD)/local
 export PATH := $(LOCAL_DIR)/bin:$(PATH)
 
 
-all: toolchain-linux toolchain-windows toolchain-mac
+all: toolchain-all
+
+
+# Toolchain build
 
 
 crosstool-ng := $(LOCAL_DIR)/bin/ct-ng
@@ -64,6 +70,19 @@ $(rack-sdk):
 RACK_DIR := $(PWD)/$(rack-sdk)
 
 
+toolchain-all: toolchain-linux toolchain-windows toolchain-mac rack-sdk
+
+
+toolchain-clean:
+	rm -rf local osxcross $(rack-sdk)
+
+
+# Plugin build
+
+
+PLUGIN_BUILD_DIR := plugin-build
+
+
 plugin-build-mac: export PATH := $(PWD)/osxcross/target/bin:$(PATH)
 plugin-build-mac: export CC := x86_64-apple-darwin17-clang
 plugin-build-mac: export CXX := x86_64-apple-darwin17-clang++-libc++
@@ -88,12 +107,19 @@ plugin-build-mac plugin-build-windows plugin-build-linux:
 	cd $(PLUGIN_DIR) && $(MAKE) cleandep
 	cd $(PLUGIN_DIR) && $(MAKE) dep
 	cd $(PLUGIN_DIR) && $(MAKE) dist
-	mkdir -p plugin-build
-	cp $(PLUGIN_DIR)/dist/*.zip plugin-build/
+	mkdir -p $(PLUGIN_BUILD_DIR)
+	cp $(PLUGIN_DIR)/dist/*.zip $(PLUGIN_BUILD_DIR)/
 	cd $(PLUGIN_DIR) && $(MAKE) clean
 
 
 plugin-build: plugin-build-mac plugin-build-windows plugin-build-linux
+
+
+plugin-build-clean:
+	rm -rf $(PLUGIN_BUILD_DIR)
+
+
+# Docker helpers
 
 
 dep-ubuntu:
@@ -127,6 +153,7 @@ dep-ubuntu:
 		texinfo \
 		help2man
 
+
 dep-arch-linux:
 	# TODO Complete this list
 	sudo pacman -S --needed \
@@ -137,9 +164,6 @@ dep-arch-linux:
 docker-build:
 	docker build -t rack-plugin-toolchain:1 .
 
+
 docker-run:
 	docker run --rm -it rack-plugin-toolchain:1
-
-
-.NOTPARALLEL:
-.PHONY: all plugin-build

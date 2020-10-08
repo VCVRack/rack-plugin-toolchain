@@ -27,7 +27,7 @@ make rack-sdk
 
 Build plugin package for all platforms.
 ```
-m plugin-build PLUGIN_DIR=...
+make plugin-build PLUGIN_DIR=...
 ```
 
 This places packages in `plugin-build/`.
