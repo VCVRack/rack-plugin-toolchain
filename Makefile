@@ -103,6 +103,11 @@ plugin-build-linux: export STRIP := x86_64-ubuntu16.04-linux-gnu-strip
 
 
 plugin-build-mac plugin-build-windows plugin-build-linux: export RACK_DIR := $(RACK_DIR)
+# Since the compiler we're using could have a newer version than the minimum supported libstdc++ version, link it statically.
+# Rack v2 includes this flag in plugin.mk, so remove it after it releases.
+plugin-build-mac plugin-build-windows plugin-build-linux: export LDFLAGS := -static-libstdc++
+
+
 plugin-build-mac plugin-build-windows plugin-build-linux:
 	cd $(PLUGIN_DIR) && $(MAKE) clean
 	cd $(PLUGIN_DIR) && $(MAKE) cleandep
@@ -113,7 +118,10 @@ plugin-build-mac plugin-build-windows plugin-build-linux:
 	cd $(PLUGIN_DIR) && $(MAKE) clean
 
 
-plugin-build: plugin-build-mac plugin-build-windows plugin-build-linux
+plugin-build:
+	$(MAKE) plugin-build-mac
+	$(MAKE) plugin-build-windows
+	$(MAKE) plugin-build-linux
 
 
 plugin-build-clean:
