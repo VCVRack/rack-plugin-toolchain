@@ -1,38 +1,44 @@
 
 Build Rack plugins for Mac, Windows, and Linux with a single command on any Linux distro.
-Coming soon: Use Docker to build on Mac, Windows, or Linux.
 
+## General prerequisites
 
-## Building
-
-Clone this repository in a path without spaces, or the Makefile will break.
+**IMPORTANT:** Clone this repository in a path without spaces, or the Makefile will break.
 
 Obtain `MacOSX10.13.sdk.tar.bz2` using the method at https://github.com/tpoechtrager/osxcross#packaging-the-sdk, and place it in the root of this repository.
-This must be done on a computer with Mac 10.13.
+This must be done on a computer with macOS 10.13.
+
+Place `MacOSX10.13.sdk.tar.bz2` in root directory of this repository.
+
+## Local toolchain build
 
 Build toolchains for each platform.
 ```
-make toolchain-linux
-make toolchain-windows
-make toolchain-mac
+make toolchain-all
 ```
 Each toolchain will take around an hour to build, requiring network access and about 15 GB free disk space.
 The final disk space after building is about 1.6 GB.
 
-Download the latest Rack SDK.
+Execute plugin build.
 ```
-make rack-sdk
-```
-
-## Building plugins
-
-Build plugin package for all platforms.
-```
-make plugin-build PLUGIN_DIR=...
+make plugin-build -j 8 PLUGIN_DIR=...
 ```
 
-This places packages in `plugin-build/`.
+Build artifacts will be located in `plugin-build` directory.
 
+## Docker-based toolchain build
+
+Build Docker image with toolchains for each platform.
+```
+make docker-build
+```
+
+Execute plugin build in Docker container.
+```
+make docker-run -j 8 PLUGIN_DIR=...
+```
+
+Build artifacts will be located in `plugin-build` directory.
 
 ## Acknowledgments
 

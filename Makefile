@@ -57,7 +57,7 @@ $(toolchain-mac):
 	#cd $@/build/llvm-10.0.1.src/build && make install
 
 	# Build osxcross
-	cp MacOSX10.13.sdk.tar.bz2 $@/tarballs/
+	cp MacOSX10.13.sdk.tar.* $@/tarballs/
 	cd $@ && UNATTENDED=1 TARGET_DIR="$(LOCAL_DIR)/osxcross" ./build.sh
 	rm -rf osxcross
 
@@ -132,8 +132,8 @@ plugin-build-clean:
 
 
 dep-ubuntu:
-	sudo apt-get update
-	sudo apt-get install -y --no-install-recommends \
+	apt-get update
+	apt-get install -y --no-install-recommends \
 		ca-certificates \
 		git \
 		build-essential \
@@ -160,7 +160,11 @@ dep-ubuntu:
 		libxml2-dev \
 		libssl-dev \
 		texinfo \
-		help2man
+		help2man \
+		clang \
+		libz-dev \
+		rsync
+	rm -rf /var/lib/apt/lists/*
 
 
 dep-arch-linux:
@@ -175,4 +179,12 @@ docker-build:
 
 
 docker-run:
-	docker run --rm -it rack-plugin-toolchain:1
+	mkdir -p $(PLUGIN_BUILD_DIR)
+	docker run --rm -it \
+		-v $(PLUGIN_DIR):/home/build/plugin-src \
+		-v $(PWD)/$(PLUGIN_BUILD_DIR):/home/build/$(PLUGIN_BUILD_DIR) \
+		-e PLUGIN_DIR=plugin-src \
+		rack-plugin-toolchain:1 \
+		/bin/bash \
+		-c "$(MAKE) plugin-build $(MFLAGS)"
+
