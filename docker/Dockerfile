@@ -8,17 +8,22 @@ RUN useradd --create-home --uid 1000 --gid 1000 --shell /bin/bash build
 ENV DEBIAN_FRONTEND=noninteractive
 RUN apt-get update && apt-get install -y --no-install-recommends make
 
-WORKDIR /home/build
+USER build
+RUN mkdir -p /home/build/rack-plugin-toolchain
+WORKDIR /home/build/rack-plugin-toolchain
 
-COPY Makefile /home/build/Makefile
+COPY Makefile /home/build/rack-plugin-toolchain/
 
 # Install dependencies for building toolchains and plugins
+USER root
 RUN make dep-ubuntu
+RUN rm -rf /var/lib/apt/lists/*
 
 USER build
-COPY MacOSX10.13.sdk.tar.xz /home/build/MacOSX10.13.sdk.tar.xz
+COPY MacOSX10.13.sdk.tar.* /home/build/rack-plugin-toolchain/
 
-RUN make toolchain-all
+RUN make toolchain-mac
+RUN make toolchain-win
+RUN make toolchain-lin
 
-RUN rm /home/build/MacOSX10.13.sdk.tar.xz
-RUN rm /home/build/build.log
+RUN rm MacOSX10.13.sdk.tar.*

@@ -26,27 +26,27 @@ $(crosstool-ng):
 	rm -rf crosstool-ng-1.24.0
 
 
-toolchain-linux := $(LOCAL_DIR)/x86_64-ubuntu16.04-linux-gnu
-toolchain-linux: $(toolchain-linux)
-$(toolchain-linux): $(crosstool-ng)
+toolchain-lin := $(LOCAL_DIR)/x86_64-ubuntu16.04-linux-gnu
+toolchain-lin: $(toolchain-lin)
+$(toolchain-lin): $(crosstool-ng)
 	ct-ng x86_64-ubuntu16.04-linux-gnu
 	CT_PREFIX="$(LOCAL_DIR)" ct-ng build
-	rm -rf .build .config
+	rm -rf .build .config build.log
 	# HACK Copy GL include dir to toolchain sysroot
-	chmod +w $(toolchain-linux)/x86_64-ubuntu16.04-linux-gnu/sysroot/usr/include
-	cp -r /usr/include/GL $(toolchain-linux)/x86_64-ubuntu16.04-linux-gnu/sysroot/usr/include/
-	chmod -w $(toolchain-linux)/x86_64-ubuntu16.04-linux-gnu/sysroot/usr/include
+	chmod +w $(toolchain-lin)/x86_64-ubuntu16.04-linux-gnu/sysroot/usr/include
+	cp -r /usr/include/GL $(toolchain-lin)/x86_64-ubuntu16.04-linux-gnu/sysroot/usr/include/
+	chmod -w $(toolchain-lin)/x86_64-ubuntu16.04-linux-gnu/sysroot/usr/include
 
 
-toolchain-windows := $(LOCAL_DIR)/x86_64-w64-mingw32
-toolchain-windows: $(toolchain-windows)
-$(toolchain-windows): $(crosstool-ng)
+toolchain-win := $(LOCAL_DIR)/x86_64-w64-mingw32
+toolchain-win: $(toolchain-win)
+$(toolchain-win): $(crosstool-ng)
 	ct-ng x86_64-w64-mingw32
 	CT_PREFIX="$(LOCAL_DIR)" ct-ng build
-	rm -rf .build .config
+	rm -rf .build .config build.log
 
 
-toolchain-mac := osxcross
+toolchain-mac := $(LOCAL_DIR)/osxcross
 toolchain-mac: $(toolchain-mac)
 $(toolchain-mac):
 	git clone "https://github.com/tpoechtrager/osxcross.git" $@
@@ -71,7 +71,7 @@ $(rack-sdk):
 RACK_DIR := $(PWD)/$(rack-sdk)
 
 
-toolchain-all: toolchain-linux toolchain-windows toolchain-mac rack-sdk
+toolchain-all: toolchain-lin toolchain-win toolchain-mac rack-sdk
 
 
 toolchain-clean:
@@ -90,10 +90,10 @@ plugin-build-mac: export CXX := x86_64-apple-darwin17-clang++-libc++
 plugin-build-mac: export STRIP := x86_64-apple-darwin17-strip
 
 
-plugin-build-windows: export PATH := $(LOCAL_DIR)/x86_64-w64-mingw32/bin:$(PATH)
-plugin-build-windows: export CC := x86_64-w64-mingw32-gcc
-plugin-build-windows: export CXX := x86_64-w64-mingw32-g++
-plugin-build-windows: export STRIP := x86_64-w64-mingw32-strip
+plugin-build-win: export PATH := $(LOCAL_DIR)/x86_64-w64-mingw32/bin:$(PATH)
+plugin-build-win: export CC := x86_64-w64-mingw32-gcc
+plugin-build-win: export CXX := x86_64-w64-mingw32-g++
+plugin-build-win: export STRIP := x86_64-w64-mingw32-strip
 
 
 plugin-build-linux: export PATH:=$(LOCAL_DIR)/x86_64-ubuntu16.04-linux-gnu/bin:$(PATH)
@@ -102,13 +102,13 @@ plugin-build-linux: export CXX := x86_64-ubuntu16.04-linux-gnu-g++
 plugin-build-linux: export STRIP := x86_64-ubuntu16.04-linux-gnu-strip
 
 
-plugin-build-mac plugin-build-windows plugin-build-linux: export RACK_DIR := $(RACK_DIR)
+plugin-build-mac plugin-build-win plugin-build-linux: export RACK_DIR := $(RACK_DIR)
 # Since the compiler we're using could have a newer version than the minimum supported libstdc++ version, link it statically.
 # Rack v2 includes this flag in plugin.mk, so remove it after it releases.
-plugin-build-mac plugin-build-windows plugin-build-linux: export LDFLAGS := -static-libstdc++
+plugin-build-mac plugin-build-win plugin-build-linux: export LDFLAGS := -static-libstdc++
 
 
-plugin-build-mac plugin-build-windows plugin-build-linux:
+plugin-build-mac plugin-build-win plugin-build-linux:
 	cd $(PLUGIN_DIR) && $(MAKE) clean
 	cd $(PLUGIN_DIR) && $(MAKE) cleandep
 	cd $(PLUGIN_DIR) && $(MAKE) dep
@@ -120,7 +120,7 @@ plugin-build-mac plugin-build-windows plugin-build-linux:
 
 plugin-build:
 	$(MAKE) plugin-build-mac
-	$(MAKE) plugin-build-windows
+	$(MAKE) plugin-build-win
 	$(MAKE) plugin-build-linux
 
 
@@ -164,7 +164,6 @@ dep-ubuntu:
 		clang \
 		libz-dev \
 		rsync
-	rm -rf /var/lib/apt/lists/*
 
 
 dep-arch-linux:
@@ -175,16 +174,31 @@ dep-arch-linux:
 
 
 docker-build:
-	docker build -t rack-plugin-toolchain:1 .
+	docker build --tag rack-plugin-toolchain:1 docker
 
+
+DOCKER_RUN := docker run --rm --interactive --tty \
+	--volume=$(PLUGIN_DIR):/home/build/plugin-src \
+	--volume=$(PWD)/$(PLUGIN_BUILD_DIR):/home/build/$(PLUGIN_BUILD_DIR) \
+	--env PLUGIN_DIR=/home/build/plugin-src \
+	rack-plugin-toolchain:1 \
+	/bin/bash
 
 docker-run:
-	mkdir -p $(PLUGIN_BUILD_DIR)
-	docker run --rm -it \
-		-v $(PLUGIN_DIR):/home/build/plugin-src \
-		-v $(PWD)/$(PLUGIN_BUILD_DIR):/home/build/$(PLUGIN_BUILD_DIR) \
-		-e PLUGIN_DIR=plugin-src \
-		rack-plugin-toolchain:1 \
-		/bin/bash \
-		-c "$(MAKE) plugin-build $(MFLAGS)"
+	$(DOCKER_RUN)
 
+docker-plugin-build-mac:
+	mkdir -p $(PLUGIN_BUILD_DIR)
+	$(DOCKER_RUN) -c "$(MAKE) plugin-build-mac"
+
+docker-plugin-build-win:
+	mkdir -p $(PLUGIN_BUILD_DIR)
+	$(DOCKER_RUN) -c "$(MAKE) plugin-build-win"
+
+docker-plugin-build-lin:
+	mkdir -p $(PLUGIN_BUILD_DIR)
+	$(DOCKER_RUN) -c "$(MAKE) plugin-build-lin"
+
+docker-plugin-build:
+	mkdir -p $(PLUGIN_BUILD_DIR)
+	$(DOCKER_RUN) -c "$(MAKE) plugin-build"

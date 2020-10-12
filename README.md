@@ -6,7 +6,7 @@ Build Rack plugins for Mac, Windows, and Linux with a single command on any Linu
 **IMPORTANT:** Clone this repository in a path without spaces, or the Makefile will break.
 
 Obtain `MacOSX10.13.sdk.tar.bz2` using the method at https://github.com/tpoechtrager/osxcross#packaging-the-sdk, and place it in the root of this repository.
-This must be done on a computer with macOS 10.13.
+This must be done on a computer with Macintosh 10.13.
 
 Place `MacOSX10.13.sdk.tar.bz2` in root directory of this repository.
 
@@ -21,7 +21,7 @@ The final disk space after building is about 1.6 GB.
 
 Execute plugin build.
 ```
-make plugin-build -j 8 PLUGIN_DIR=...
+make plugin-build -j8 PLUGIN_DIR=...
 ```
 
 Build artifacts will be located in `plugin-build` directory.
@@ -35,7 +35,7 @@ make docker-build
 
 Execute plugin build in Docker container.
 ```
-make docker-run -j 8 PLUGIN_DIR=...
+make docker-plugin-build -j8 PLUGIN_DIR=...
 ```
 
 Build artifacts will be located in `plugin-build` directory.
