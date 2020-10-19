@@ -1,2 +1,4 @@
-MacOSX10.13.sdk.tar.xz
+MacOSX10.13.sdk.tar.*
+local/
 plugin-build/
+osxcross/

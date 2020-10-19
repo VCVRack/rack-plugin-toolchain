@@ -1,7 +1,3 @@
-.NOTPARALLEL:
-.PHONY: all plugin-build
-
-
 # Installation path for executables
 LOCAL_DIR := $(PWD)/local
 # Local programs should have higher path priority than system-installed programs
@@ -48,17 +44,27 @@ $(toolchain-win): $(crosstool-ng)
 
 toolchain-mac := $(LOCAL_DIR)/osxcross
 toolchain-mac: $(toolchain-mac)
+MAC_CLANG_VERSION := 10.0.1
+MAC_BINUTILS_VERSION := 2.35
+# Binaries from ./build.sh must be available in order to run ./build_binutils.sh
+$(toolchain-mac): export PATH := $(LOCAL_DIR)/osxcross/bin:$(PATH)
 $(toolchain-mac):
-	git clone "https://github.com/tpoechtrager/osxcross.git" $@
-	cd $@ && git checkout a791ad4fca685ea9fceb520b77db586881cd3f3d
+	# Download osxcross
+	git clone "https://github.com/tpoechtrager/osxcross.git" osxcross
+	cd osxcross && git checkout a791ad4fca685ea9fceb520b77db586881cd3f3d
 
 	# Build clang
-	#cd $@ && UNATTENDED=1 DISABLE_BOOTSTRAP=1 INSTALLPREFIX="$(LOCAL_DIR)" OCDEBUG=1 ./build_clang.sh
-	#cd $@/build/llvm-10.0.1.src/build && make install
+	cd osxcross && UNATTENDED=1 DISABLE_BOOTSTRAP=1 INSTALLPREFIX="$(LOCAL_DIR)" CLANG_VERSION=$(MAC_CLANG_VERSION) OCDEBUG=1 ./build_clang.sh
+	cd osxcross/build/llvm-$(MAC_CLANG_VERSION).src/build && make install
 
 	# Build osxcross
-	cp MacOSX10.13.sdk.tar.* $@/tarballs/
-	cd $@ && UNATTENDED=1 TARGET_DIR="$(LOCAL_DIR)/osxcross" ./build.sh
+	cp MacOSX10.13.sdk.tar.* osxcross/tarballs/
+	cd osxcross && UNATTENDED=1 TARGET_DIR="$(LOCAL_DIR)/osxcross" ./build.sh
+
+	# Build Mac version of binutils and build LLVM gold
+	cd osxcross && BINUTILS_VERSION=$(MAC_BINUTILS_VERSION) TARGET_DIR="$(LOCAL_DIR)/osxcross" ./build_binutils.sh
+	cd osxcross/build/llvm-$(MAC_CLANG_VERSION).src/build && cmake .. -DLLVM_BINUTILS_INCDIR=$(PWD)/osxcross/build/binutils-$(MAC_BINUTILS_VERSION)/include && make install
+
 	rm -rf osxcross
 
 
@@ -82,6 +88,7 @@ toolchain-clean:
 
 
 PLUGIN_BUILD_DIR := plugin-build
+PLUGIN_DIR ?=
 
 
 plugin-build-mac: export PATH := $(LOCAL_DIR)/osxcross/bin:$(PATH)
@@ -174,7 +181,7 @@ dep-arch-linux:
 
 
 docker-build:
-	docker build --tag rack-plugin-toolchain:1 docker
+	docker build --tag rack-plugin-toolchain:1 .
 
 
 DOCKER_RUN := docker run --rm --interactive --tty \
@@ -202,3 +209,7 @@ docker-plugin-build-lin:
 docker-plugin-build:
 	mkdir -p $(PLUGIN_BUILD_DIR)
 	$(DOCKER_RUN) -c "$(MAKE) plugin-build"
+
+
+.NOTPARALLEL:
+.PHONY: all plugin-build
