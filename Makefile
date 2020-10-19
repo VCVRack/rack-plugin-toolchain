@@ -186,7 +186,7 @@ docker-build:
 
 DOCKER_RUN := docker run --rm --interactive --tty \
 	--volume=$(PLUGIN_DIR):/home/build/plugin-src \
-	--volume=$(PWD)/$(PLUGIN_BUILD_DIR):/home/build/$(PLUGIN_BUILD_DIR) \
+	--volume=$(PWD)/$(PLUGIN_BUILD_DIR):/home/build/rack-plugin-toolchain/$(PLUGIN_BUILD_DIR) \
 	--env PLUGIN_DIR=/home/build/plugin-src \
 	rack-plugin-toolchain:1 \
 	/bin/bash
