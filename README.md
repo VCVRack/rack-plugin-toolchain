@@ -1,44 +1,64 @@
+# VCV Rack plugin build toolchains
 
-Build Rack plugins for Mac, Windows, and Linux with a single command on any Linux distro.
+Compile Rack plugins for Mac, Windows, and Linux with a single command on any Linux distro.
 
-## General prerequisites
+## Building
 
-**IMPORTANT:** Clone this repository in a path without spaces, or the Makefile will break.
+Clone this repository in a path without spaces, or the Makefile will break.
 
 Obtain `MacOSX10.13.sdk.tar.bz2` using the method at https://github.com/tpoechtrager/osxcross#packaging-the-sdk, and place it in the root of this repository.
-This must be done on a computer with Macintosh 10.13.
+This must be done on a computer with Mac 10.13.
 
-Place `MacOSX10.13.sdk.tar.bz2` in root directory of this repository.
+There are two ways to build the toolchains:
+- Locally on Linux: Uses your system's compilers to build the toolchains.
+- In a Docker container: Downloads an Ubuntu image and installs all dependencies in the container.
 
-## Local toolchain build
+### Local toolchain build
+
+*Requires a Linux host.*
+
+Install toolchain build dependencies.
+On Ubuntu,
+```bash
+sudo make dep-ubuntu
+```
+Or on Arch Linux,
+```bash
+sudo make dep-arch-linux
+```
 
 Build toolchains for each platform.
-```
-make toolchain-all
+```bash
+make toolchain-lin
+make toolchain-win
+make toolchain-mac
 ```
 Each toolchain will take around an hour to build, requiring network access and about 15 GB free disk space.
-The final disk space after building is about 1.6 GB.
+The final disk space after building is about 3.7 GB.
 
-Execute plugin build.
+Build your plugin.
+```bash
+make plugin-build PLUGIN_DIR=...
 ```
-make plugin-build -j8 PLUGIN_DIR=...
-```
+To speed up builds, use `-jN` to launch N parallel jobs, such as your number of logical cores.
 
-Build artifacts will be located in `plugin-build` directory.
+Built plugin packages are placed in the `plugin-build/` directory.
 
-## Docker-based toolchain build
+### Docker toolchain build
 
-Build Docker image with toolchains for each platform.
-```
+*Works on any operating system with [Docker](https://www.docker.com/) installed.*
+
+Build the Docker container with toolchains for all platforms.
+```bash
 make docker-build
 ```
 
-Execute plugin build in Docker container.
-```
-make docker-plugin-build -j8 PLUGIN_DIR=...
+Build your plugin.
+```bash
+make docker-plugin-build PLUGIN_DIR=...
 ```
 
-Build artifacts will be located in `plugin-build` directory.
+Built plugin packages are placed in the `plugin-build/` directory.
 
 ## Acknowledgments
 
