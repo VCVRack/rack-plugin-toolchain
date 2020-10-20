@@ -30,4 +30,7 @@ RUN make toolchain-mac
 RUN make toolchain-win
 RUN make toolchain-lin
 
+# Install Rack SDK
+RUN make rack-sdk
+
 RUN rm MacOSX10.13.sdk.tar.*
