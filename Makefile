@@ -196,19 +196,19 @@ docker-run:
 
 docker-plugin-build-mac:
 	mkdir -p $(PLUGIN_BUILD_DIR)
-	$(DOCKER_RUN) -c "$(MAKE) plugin-build-mac"
+	$(DOCKER_RUN) -c "$(MAKE) plugin-build-mac $(MFLAGS)"
 
 docker-plugin-build-win:
 	mkdir -p $(PLUGIN_BUILD_DIR)
-	$(DOCKER_RUN) -c "$(MAKE) plugin-build-win"
+	$(DOCKER_RUN) -c "$(MAKE) plugin-build-win $(MFLAGS)"
 
 docker-plugin-build-lin:
 	mkdir -p $(PLUGIN_BUILD_DIR)
-	$(DOCKER_RUN) -c "$(MAKE) plugin-build-lin"
+	$(DOCKER_RUN) -c "$(MAKE) plugin-build-lin $(MFLAGS)"
 
 docker-plugin-build:
 	mkdir -p $(PLUGIN_BUILD_DIR)
-	$(DOCKER_RUN) -c "$(MAKE) plugin-build"
+	$(DOCKER_RUN) -c "$(MAKE) plugin-build $(MFLAGS)"
 
 
 .NOTPARALLEL:
