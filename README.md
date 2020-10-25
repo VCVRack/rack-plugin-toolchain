@@ -6,8 +6,8 @@ Compile Rack plugins for Mac, Windows, and Linux with a single command on any Li
 
 Clone this repository in a path without spaces, or the Makefile will break.
 
-Obtain `MacOSX10.13.sdk.tar.bz2` using the method at https://github.com/tpoechtrager/osxcross#packaging-the-sdk, and place it in the root of this repository.
-This must be done on a computer with Mac 10.13.
+Obtain `MacOSX10.13.sdk.tar.xz` (or `.bz2`, either works) using the instructions at https://github.com/tpoechtrager/osxcross#packaging-the-sdk, and place it in the root of this repository.
+You must have access to Mac 10.13 to generate this SDK package.
 
 There are two ways to build the toolchains:
 - Locally on Linux: Uses your system's compilers to build the toolchains.
@@ -38,9 +38,8 @@ The final disk space after building is about 3.7 GB.
 
 Build your plugin.
 ```bash
-make plugin-build PLUGIN_DIR=...
+make -j$(nproc) plugin-build PLUGIN_DIR=...
 ```
-To speed up builds, use `-jN` to launch N parallel jobs, such as your number of logical cores.
 
 Built plugin packages are placed in the `plugin-build/` directory.
 
@@ -55,8 +54,9 @@ make docker-build
 
 Build your plugin.
 ```bash
-make docker-plugin-build PLUGIN_DIR=...
+make -j8 docker-plugin-build PLUGIN_DIR=...
 ```
+You may replace 8 with your desired number of parallel jobs, such as your number of logical cores.
 
 Built plugin packages are placed in the `plugin-build/` directory.
 
