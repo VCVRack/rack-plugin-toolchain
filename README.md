@@ -27,11 +27,9 @@ Or on Arch Linux,
 sudo make dep-arch-linux
 ```
 
-Build toolchains for each platform.
+Build toolchains for all three platforms.
 ```bash
-make toolchain-lin
-make toolchain-win
-make toolchain-mac
+make toolchain-all
 ```
 Each toolchain will take around an hour to build, requiring network access and about 15 GB free disk space.
 The final disk space after building is about 3.7 GB.
