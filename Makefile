@@ -170,7 +170,10 @@ dep-ubuntu:
 		help2man \
 		clang \
 		libz-dev \
-		rsync
+		rsync \
+		xxd \
+		perl \
+		coreutils
 
 
 dep-arch-linux:
