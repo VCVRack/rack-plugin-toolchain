@@ -23,7 +23,7 @@ RUN make dep-ubuntu
 RUN rm -rf /var/lib/apt/lists/*
 
 USER build
-COPY MacOSX10.13.sdk.tar.* /home/build/rack-plugin-toolchain/
+COPY MacOSX11.1.sdk.tar.* /home/build/rack-plugin-toolchain/
 
 # Build toolchains
 RUN make toolchain-mac
@@ -33,4 +33,4 @@ RUN make toolchain-lin
 # Install Rack SDK
 RUN make rack-sdk
 
-RUN rm MacOSX10.13.sdk.tar.*
+RUN rm MacOSX11.1.sdk.tar.*

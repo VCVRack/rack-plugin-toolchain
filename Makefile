@@ -12,14 +12,13 @@ all: toolchain-all
 
 crosstool-ng := $(LOCAL_DIR)/bin/ct-ng
 $(crosstool-ng):
-	wget -c "http://crosstool-ng.org/download/crosstool-ng/crosstool-ng-1.24.0.tar.xz"
-	tar -xf crosstool-ng-1.24.0.tar.xz
-	rm crosstool-ng-1.24.0.tar.xz
-	cd crosstool-ng-1.24.0 && ./bootstrap
-	cd crosstool-ng-1.24.0 && ./configure --prefix="$(LOCAL_DIR)"
-	cd crosstool-ng-1.24.0 && make
-	cd crosstool-ng-1.24.0 && make install
-	rm -rf crosstool-ng-1.24.0
+	git clone https://github.com/crosstool-ng/crosstool-ng.git
+	cd crosstool-ng && git checkout 02d1503f6769be4ad8058b393d4245febced459f
+	cd crosstool-ng && ./bootstrap
+	cd crosstool-ng && ./configure --prefix="$(LOCAL_DIR)"
+	cd crosstool-ng && make
+	cd crosstool-ng && make install
+	rm -rf crosstool-ng
 
 
 toolchain-lin := $(LOCAL_DIR)/x86_64-ubuntu16.04-linux-gnu
@@ -44,21 +43,21 @@ $(toolchain-win): $(crosstool-ng)
 
 toolchain-mac := $(LOCAL_DIR)/osxcross
 toolchain-mac: $(toolchain-mac)
-MAC_CLANG_VERSION := 10.0.1
-MAC_BINUTILS_VERSION := 2.35
+MAC_CLANG_VERSION := 12.0.1
+MAC_BINUTILS_VERSION := 2.37
 # Binaries from ./build.sh must be available in order to run ./build_binutils.sh
 $(toolchain-mac): export PATH := $(LOCAL_DIR)/osxcross/bin:$(PATH)
 $(toolchain-mac):
 	# Download osxcross
 	git clone "https://github.com/tpoechtrager/osxcross.git" osxcross
-	cd osxcross && git checkout a791ad4fca685ea9fceb520b77db586881cd3f3d
+	cd osxcross && git checkout 0f87f567dfaf98460244471ad6c0f4311d62079c
 
 	# Build clang
 	cd osxcross && UNATTENDED=1 DISABLE_BOOTSTRAP=1 INSTALLPREFIX="$(LOCAL_DIR)" CLANG_VERSION=$(MAC_CLANG_VERSION) OCDEBUG=1 ./build_clang.sh
 	cd osxcross/build/llvm-$(MAC_CLANG_VERSION).src/build && make install
 
 	# Build osxcross
-	cp MacOSX10.13.sdk.tar.* osxcross/tarballs/
+	cp MacOSX11.1.sdk.tar.* osxcross/tarballs/
 	cd osxcross && UNATTENDED=1 TARGET_DIR="$(LOCAL_DIR)/osxcross" ./build.sh
 
 	# Build Mac version of binutils and build LLVM gold
@@ -92,9 +91,9 @@ PLUGIN_DIR ?=
 
 
 plugin-build-mac: export PATH := $(LOCAL_DIR)/osxcross/bin:$(PATH)
-plugin-build-mac: export CC := x86_64-apple-darwin17-clang
-plugin-build-mac: export CXX := x86_64-apple-darwin17-clang++-libc++
-plugin-build-mac: export STRIP := x86_64-apple-darwin17-strip
+plugin-build-mac: export CC := x86_64-apple-darwin20.2-clang
+plugin-build-mac: export CXX := x86_64-apple-darwin20.2-clang++-libc++
+plugin-build-mac: export STRIP := x86_64-apple-darwin20.2-strip
 
 
 plugin-build-win: export PATH := $(LOCAL_DIR)/x86_64-w64-mingw32/bin:$(PATH)
@@ -184,14 +183,14 @@ dep-arch-linux:
 
 
 docker-build:
-	docker build --tag rack-plugin-toolchain:1 .
+	docker build --tag rack-plugin-toolchain:2 .
 
 
 DOCKER_RUN := docker run --rm --interactive --tty \
 	--volume=$(PLUGIN_DIR):/home/build/plugin-src \
 	--volume=$(PWD)/$(PLUGIN_BUILD_DIR):/home/build/rack-plugin-toolchain/$(PLUGIN_BUILD_DIR) \
 	--env PLUGIN_DIR=/home/build/plugin-src \
-	rack-plugin-toolchain:1 \
+	rack-plugin-toolchain:2 \
 	/bin/bash
 
 docker-run:

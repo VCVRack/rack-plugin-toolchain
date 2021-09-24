@@ -1,4 +1,4 @@
-MacOSX10.13.sdk.tar.*
+MacOSX*.sdk.tar.*
 local/
 plugin-build/
 Rack-SDK/
