@@ -6,8 +6,8 @@ Compile Rack plugins for Mac, Windows, and Linux with a single command on any Li
 
 Clone this repository in a path without spaces, or the Makefile will break.
 
-Obtain `MacOSX10.13.sdk.tar.xz` (or `.bz2`, either works) using the instructions at https://github.com/tpoechtrager/osxcross#packaging-the-sdk, and place it in the root of this repository.
-You must have access to Mac 10.13 to generate this SDK package.
+Obtain `MacOSX11.1.sdk.tar.xz` (or `.bz2`, either works) using the instructions at https://github.com/tpoechtrager/osxcross#packaging-the-sdk, and place it in the root of this repository.
+You must have access to a Mac with Xcode 12.4 to generate this SDK package.
 
 There are two ways to build the toolchains:
 - Locally on Linux: Uses your system's compilers to build the toolchains.
