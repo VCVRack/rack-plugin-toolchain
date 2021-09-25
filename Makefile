@@ -58,7 +58,7 @@ $(toolchain-mac):
 
 	# Build osxcross
 	cp MacOSX11.1.sdk.tar.* osxcross/tarballs/
-	cd osxcross && UNATTENDED=1 TARGET_DIR="$(LOCAL_DIR)/osxcross" ./build.sh
+	cd osxcross && PATH="$(LOCAL_DIR)/bin:$(PATH)" UNATTENDED=1 TARGET_DIR="$(LOCAL_DIR)/osxcross" ./build.sh
 
 	# Build Mac version of binutils and build LLVM gold
 	cd osxcross && BINUTILS_VERSION=$(MAC_BINUTILS_VERSION) TARGET_DIR="$(LOCAL_DIR)/osxcross" ./build_binutils.sh
@@ -167,7 +167,6 @@ dep-ubuntu:
 		libssl-dev \
 		texinfo \
 		help2man \
-		clang \
 		libz-dev \
 		rsync \
 		xxd \
