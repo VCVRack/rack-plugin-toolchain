@@ -1,17 +1,17 @@
 # VCV Rack plugin build toolchains
 
-Compile Rack plugins for Mac, Windows, and Linux with a single command on any Linux distro.
+**Cross-compile** Rack plugins for Mac, Windows, and Linux with a single command on any Linux distro.
 
 ## Building
 
-Clone this repository in a path without spaces, or the Makefile will break.
+Clone this repository in a **path without spaces**, or the Makefile will break.
 
-Obtain `MacOSX11.1.sdk.tar.xz` (or `.bz2`, either works) using the instructions at https://github.com/tpoechtrager/osxcross#packaging-the-sdk, and place it in the root of this repository.
-You must have access to a Mac with Xcode 12.4 to generate this SDK package.
+Obtain `MacOSX11.1.sdk.tar.xz` using the instructions at https://github.com/tpoechtrager/osxcross#packaging-the-sdk, and place it in the root of this repository.
+You must have access to a Mac with **Xcode 12.4** to generate this SDK package. You **must** use this specific SDK version to build the toolchains.
 
 There are two ways to build the toolchains:
 - Locally on Linux: Uses your system's compilers to build the toolchains.
-- In a Docker container: Downloads an Ubuntu image and installs all dependencies in the container.
+- In a Docker container: This method uses an Ubuntu 20.04 base image and installs all dependencies necessary to build the toolchains.
 
 ### Local toolchain build
 
