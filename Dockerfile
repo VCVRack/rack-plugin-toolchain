@@ -31,6 +31,8 @@ RUN make toolchain-win
 RUN make toolchain-lin
 
 # Install Rack SDK
-RUN make rack-sdk
+RUN make rack-sdk-mac
+RUN make rack-sdk-win
+RUN make rack-sdk-lin
 
 RUN rm MacOSX11.1.sdk.tar.*

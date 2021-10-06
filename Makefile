@@ -3,6 +3,7 @@ LOCAL_DIR := $(PWD)/local
 # Local programs should have higher path priority than system-installed programs
 export PATH := $(LOCAL_DIR)/bin:$(PATH)
 
+RACK_SDK_VERSION := 2.git.042a9ce0
 
 all: toolchain-all
 
@@ -24,6 +25,9 @@ $(crosstool-ng):
 toolchain-lin := $(LOCAL_DIR)/x86_64-ubuntu16.04-linux-gnu
 toolchain-lin: $(toolchain-lin)
 $(toolchain-lin): $(crosstool-ng)
+	# HACK until crosstool-ng has fixed its mirror for isl library
+	-mkdir /home/build/src
+	cd /home/build/src && wget ftp.halifax.rwth-aachen.de/gentoo/distfiles/isl-0.24.tar.xz
 	ct-ng x86_64-ubuntu16.04-linux-gnu
 	CT_PREFIX="$(LOCAL_DIR)" ct-ng build
 	rm -rf .build .config build.log
@@ -36,9 +40,12 @@ $(toolchain-lin): $(crosstool-ng)
 toolchain-win := $(LOCAL_DIR)/x86_64-w64-mingw32
 toolchain-win: $(toolchain-win)
 $(toolchain-win): $(crosstool-ng)
+	# HACK until crosstool-ng has fixed its mirror for isl library
+	-mkdir /home/build/src
+	cd /home/build/src && wget ftp.halifax.rwth-aachen.de/gentoo/distfiles/isl-0.24.tar.xz
 	ct-ng x86_64-w64-mingw32
 	CT_PREFIX="$(LOCAL_DIR)" ct-ng build
-	rm -rf .build .config build.log
+	rm -rf .build .config build.log /home/build/src
 
 
 toolchain-mac := $(LOCAL_DIR)/osxcross
@@ -67,20 +74,39 @@ $(toolchain-mac):
 	rm -rf osxcross
 
 
-rack-sdk := Rack-SDK
-rack-sdk: $(rack-sdk)
-$(rack-sdk):
-	wget -c "https://vcvrack.com/downloads/Rack-SDK-1.1.6.zip"
-	unzip Rack-SDK-1.1.6.zip
-	rm Rack-SDK-1.1.6.zip
-RACK_DIR := $(PWD)/$(rack-sdk)
+rack-sdk-mac := Rack-SDK-mac
+rack-sdk-mac: $(rack-sdk-mac)
+$(rack-sdk-mac):
+	wget -c "https://vcvrack.com/downloads/Rack-SDK-$(RACK_SDK_VERSION)-mac.zip"
+	unzip Rack-SDK-$(RACK_SDK_VERSION)-mac.zip
+	mv Rack-SDK Rack-SDK-mac
+	rm Rack-SDK-$(RACK_SDK_VERSION)-mac.zip
+RACK_DIR_MAC := $(PWD)/$(rack-sdk-mac)
+
+rack-sdk-win := Rack-SDK-win
+rack-sdk-win: $(rack-sdk-win)
+$(rack-sdk-win):
+	wget -c "https://vcvrack.com/downloads/Rack-SDK-$(RACK_SDK_VERSION)-win.zip"
+	unzip Rack-SDK-$(RACK_SDK_VERSION)-win.zip
+	mv Rack-SDK Rack-SDK-win
+	rm Rack-SDK-$(RACK_SDK_VERSION)-win.zip
+RACK_DIR_WIN := $(PWD)/$(rack-sdk-win)
+
+rack-sdk-lin := Rack-SDK-lin
+rack-sdk-lin: $(rack-sdk-lin)
+$(rack-sdk-lin):
+	wget -c "https://vcvrack.com/downloads/Rack-SDK-$(RACK_SDK_VERSION)-lin.zip"
+	unzip Rack-SDK-$(RACK_SDK_VERSION)-lin.zip
+	mv Rack-SDK Rack-SDK-lin
+	rm Rack-SDK-$(RACK_SDK_VERSION)-lin.zip
+RACK_DIR_LIN := $(PWD)/$(rack-sdk-lin)
 
 
-toolchain-all: toolchain-lin toolchain-win toolchain-mac rack-sdk
+toolchain-all: toolchain-lin toolchain-win toolchain-mac rack-sdk-mac rack-sdk-win rack-sdk-lin
 
 
 toolchain-clean:
-	rm -rf local osxcross $(rack-sdk)
+	rm -rf local osxcross $(rack-sdk-mac) $(rack-sdk-win) $(rack-sdk-lin)
 
 
 # Plugin build
@@ -94,6 +120,8 @@ plugin-build-mac: export PATH := $(LOCAL_DIR)/osxcross/bin:$(PATH)
 plugin-build-mac: export CC := x86_64-apple-darwin20.2-clang
 plugin-build-mac: export CXX := x86_64-apple-darwin20.2-clang++-libc++
 plugin-build-mac: export STRIP := x86_64-apple-darwin20.2-strip
+plugin-build-mac: export INSTALL_NAME_TOOL := x86_64-apple-darwin20.2-install_name_tool
+plugin-build-mac: export OTOOL := x86_64-apple-darwin20.2-otool
 
 
 plugin-build-win: export PATH := $(LOCAL_DIR)/x86_64-w64-mingw32/bin:$(PATH)
@@ -108,7 +136,9 @@ plugin-build-linux: export CXX := x86_64-ubuntu16.04-linux-gnu-g++
 plugin-build-linux: export STRIP := x86_64-ubuntu16.04-linux-gnu-strip
 
 
-plugin-build-mac plugin-build-win plugin-build-linux: export RACK_DIR := $(RACK_DIR)
+plugin-build-mac: export RACK_DIR := $(RACK_DIR_MAC)
+plugin-build-win: export RACK_DIR := $(RACK_DIR_WIN)
+plugin-build-linux: export RACK_DIR := $(RACK_DIR_LIN)
 # Since the compiler we're using could have a newer version than the minimum supported libstdc++ version, link it statically.
 # Rack v2 includes this flag in plugin.mk, so remove it after it releases.
 plugin-build-mac plugin-build-win plugin-build-linux: export LDFLAGS := -static-libstdc++
@@ -171,7 +201,9 @@ dep-ubuntu:
 		rsync \
 		xxd \
 		perl \
-		coreutils
+		coreutils \
+		zstd \
+		markdown
 
 
 dep-arch-linux:
