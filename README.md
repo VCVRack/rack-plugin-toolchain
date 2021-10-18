@@ -50,6 +50,12 @@ Build the Docker container with toolchains for all platforms.
 make docker-build
 ```
 
+*Optional*: Pass number of jobs to use to for the tool chain build with the `JOBS` environment variable.
+```bash
+JOBS=8 make docker-build
+```
+(`-j8` will not work due to the different build systems used in the toolchain build process.)
+
 Build your plugin.
 ```bash
 make -j8 docker-plugin-build PLUGIN_DIR=...

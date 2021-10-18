@@ -3,7 +3,20 @@ LOCAL_DIR := $(PWD)/local
 # Local programs should have higher path priority than system-installed programs
 export PATH := $(LOCAL_DIR)/bin:$(PATH)
 
-RACK_SDK_VERSION := 2.git.042a9ce0
+# Allow specifying the number of jobs for toolchain build for systems that need it.
+# Due to different build systems used in the toolchain build, just `make -j` won't work here.
+# Note: Plugin build uses `$(MAKE)` to inherit `-j` argument from command line.
+ifdef JOBS
+export JOBS := $(JOBS)
+# Define number of jobs for crosstool-ng (uses different argument format)
+export JOBS_CT_NG := .$(JOBS)
+else
+# If `JOBS` is not specified, default to max number of jobs.
+export JOBS :=
+export JOBS_CT_NG :=
+endif
+
+RACK_SDK_VERSION := 2.git.219bbaf1
 
 all: toolchain-all
 
@@ -17,8 +30,8 @@ $(crosstool-ng):
 	cd crosstool-ng && git checkout 02d1503f6769be4ad8058b393d4245febced459f
 	cd crosstool-ng && ./bootstrap
 	cd crosstool-ng && ./configure --prefix="$(LOCAL_DIR)"
-	cd crosstool-ng && make
-	cd crosstool-ng && make install
+	cd crosstool-ng-1.24.0 && make -j $(JOBS)
+	cd crosstool-ng-1.24.0 && make install -j $(JOBS)
 	rm -rf crosstool-ng
 
 
@@ -29,7 +42,7 @@ $(toolchain-lin): $(crosstool-ng)
 	-mkdir /home/build/src
 	cd /home/build/src && wget ftp.halifax.rwth-aachen.de/gentoo/distfiles/isl-0.24.tar.xz
 	ct-ng x86_64-ubuntu16.04-linux-gnu
-	CT_PREFIX="$(LOCAL_DIR)" ct-ng build
+	CT_PREFIX="$(LOCAL_DIR)" ct-ng build$(JOBS_CT_NG)
 	rm -rf .build .config build.log
 	# HACK Copy GL include dir to toolchain sysroot
 	chmod +w $(toolchain-lin)/x86_64-ubuntu16.04-linux-gnu/sysroot/usr/include
@@ -44,7 +57,7 @@ $(toolchain-win): $(crosstool-ng)
 	-mkdir /home/build/src
 	cd /home/build/src && wget ftp.halifax.rwth-aachen.de/gentoo/distfiles/isl-0.24.tar.xz
 	ct-ng x86_64-w64-mingw32
-	CT_PREFIX="$(LOCAL_DIR)" ct-ng build
+	CT_PREFIX="$(LOCAL_DIR)" ct-ng build$(JOBS_CT_NG)
 	rm -rf .build .config build.log /home/build/src
 
 
@@ -60,16 +73,16 @@ $(toolchain-mac):
 	cd osxcross && git checkout 0f87f567dfaf98460244471ad6c0f4311d62079c
 
 	# Build clang
-	cd osxcross && UNATTENDED=1 DISABLE_BOOTSTRAP=1 INSTALLPREFIX="$(LOCAL_DIR)" CLANG_VERSION=$(MAC_CLANG_VERSION) OCDEBUG=1 ./build_clang.sh
-	cd osxcross/build/llvm-$(MAC_CLANG_VERSION).src/build && make install
+	cd osxcross && UNATTENDED=1 DISABLE_BOOTSTRAP=1 INSTALLPREFIX="$(LOCAL_DIR)" CLANG_VERSION=$(MAC_CLANG_VERSION) OCDEBUG=1 JOBS=$(JOBS) ./build_clang.sh
+	cd osxcross/build/llvm-$(MAC_CLANG_VERSION).src/build && make install -j $(JOBS)
 
 	# Build osxcross
 	cp MacOSX11.1.sdk.tar.* osxcross/tarballs/
-	cd osxcross && PATH="$(LOCAL_DIR)/bin:$(PATH)" UNATTENDED=1 TARGET_DIR="$(LOCAL_DIR)/osxcross" ./build.sh
+	cd osxcross && PATH="$(LOCAL_DIR)/bin:$(PATH)" UNATTENDED=1 TARGET_DIR="$(LOCAL_DIR)/osxcross" JOBS=$(JOBS) ./build.sh
 
 	# Build Mac version of binutils and build LLVM gold
-	cd osxcross && BINUTILS_VERSION=$(MAC_BINUTILS_VERSION) TARGET_DIR="$(LOCAL_DIR)/osxcross" ./build_binutils.sh
-	cd osxcross/build/llvm-$(MAC_CLANG_VERSION).src/build && cmake .. -DLLVM_BINUTILS_INCDIR=$(PWD)/osxcross/build/binutils-$(MAC_BINUTILS_VERSION)/include && make install
+	cd osxcross && BINUTILS_VERSION=$(MAC_BINUTILS_VERSION) TARGET_DIR="$(LOCAL_DIR)/osxcross" JOBS=$(JOBS) ./build_binutils.sh
+	cd osxcross/build/llvm-$(MAC_CLANG_VERSION).src/build && cmake .. -DLLVM_BINUTILS_INCDIR=$(PWD)/osxcross/build/binutils-$(MAC_BINUTILS_VERSION)/include && make install -j $(JOBS)
 
 	rm -rf osxcross
 
@@ -150,7 +163,7 @@ plugin-build-mac plugin-build-win plugin-build-linux:
 	cd $(PLUGIN_DIR) && $(MAKE) dep
 	cd $(PLUGIN_DIR) && $(MAKE) dist
 	mkdir -p $(PLUGIN_BUILD_DIR)
-	cp $(PLUGIN_DIR)/dist/*.zip $(PLUGIN_BUILD_DIR)/
+	cp $(PLUGIN_DIR)/dist/*.vcvplugin $(PLUGIN_BUILD_DIR)/
 	cd $(PLUGIN_DIR) && $(MAKE) clean
 
 
@@ -214,7 +227,7 @@ dep-arch-linux:
 
 
 docker-build:
-	docker build --tag rack-plugin-toolchain:2 .
+	docker build --build-arg JOBS=$(JOBS) --tag rack-plugin-toolchain:2 .
 
 
 DOCKER_RUN := docker run --rm --interactive --tty \
