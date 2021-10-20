@@ -30,8 +30,8 @@ $(crosstool-ng):
 	cd crosstool-ng && git checkout 02d1503f6769be4ad8058b393d4245febced459f
 	cd crosstool-ng && ./bootstrap
 	cd crosstool-ng && ./configure --prefix="$(LOCAL_DIR)"
-	cd crosstool-ng-1.24.0 && make -j $(JOBS)
-	cd crosstool-ng-1.24.0 && make install -j $(JOBS)
+	cd crosstool-ng && make -j $(JOBS)
+	cd crosstool-ng && make install -j $(JOBS)
 	rm -rf crosstool-ng
 
 
