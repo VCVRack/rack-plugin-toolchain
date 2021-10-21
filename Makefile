@@ -27,7 +27,7 @@ toolchain-lin: $(toolchain-lin)
 $(toolchain-lin): $(crosstool-ng)
 	# HACK until crosstool-ng has fixed its mirror for isl library
 	-mkdir /home/build/src
-	cd /home/build/src && wget ftp.halifax.rwth-aachen.de/gentoo/distfiles/isl-0.24.tar.xz
+	cd /home/build/src && wget http://deb.debian.org/debian/pool/main/i/isl/isl_0.20.orig.tar.xz && mv isl_0.20.orig.tar.xz isl-0.20.tar.xz
 	ct-ng x86_64-ubuntu16.04-linux-gnu
 	CT_PREFIX="$(LOCAL_DIR)" ct-ng build
 	rm -rf .build .config build.log /home/build/src
@@ -42,7 +42,7 @@ toolchain-win: $(toolchain-win)
 $(toolchain-win): $(crosstool-ng)
 	# HACK until crosstool-ng has fixed its mirror for isl library
 	-mkdir /home/build/src
-	cd /home/build/src && wget ftp.halifax.rwth-aachen.de/gentoo/distfiles/isl-0.24.tar.xz
+	cd /home/build/src && wget http://deb.debian.org/debian/pool/main/i/isl/isl_0.20.orig.tar.xz && mv isl_0.20.orig.tar.xz isl-0.20.tar.xz
 	ct-ng x86_64-w64-mingw32
 	CT_PREFIX="$(LOCAL_DIR)" ct-ng build
 	rm -rf .build .config build.log /home/build/src
