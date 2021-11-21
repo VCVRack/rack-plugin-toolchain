@@ -45,6 +45,10 @@ Built plugin packages are placed in the `plugin-build/` directory.
 
 *Works on any operating system with [Docker](https://www.docker.com/) installed.*
 
+**IMPORTANT:** Do **not** invoke the Docker-based toolchain with `sudo`! There is no need to do so and it will not work correctly.
+
+Instead, follow the instructions to let non-root users manage Docker containers: https://docs.docker.com/engine/install/linux-postinstall/
+
 Build the Docker container with toolchains for all platforms.
 ```bash
 make docker-build
