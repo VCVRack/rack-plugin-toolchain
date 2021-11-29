@@ -16,7 +16,7 @@ export JOBS :=
 export JOBS_CT_NG :=
 endif
 
-RACK_SDK_VERSION := 2.beta.1
+RACK_SDK_VERSION := 2.beta.2
 
 all: toolchain-all
 
