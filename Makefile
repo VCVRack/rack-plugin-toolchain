@@ -16,7 +16,7 @@ export JOBS :=
 export JOBS_CT_NG :=
 endif
 
-RACK_SDK_VERSION := 2.0.5
+RACK_SDK_VERSION := 2.0.6
 
 all: toolchain-all
 
