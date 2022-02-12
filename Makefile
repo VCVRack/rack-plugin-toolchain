@@ -247,7 +247,7 @@ docker-plugin-build-win:
 
 docker-plugin-build-lin:
 	mkdir -p $(PLUGIN_BUILD_DIR)
-	$(DOCKER_RUN) -c "$(MAKE) plugin-build-lin $(MFLAGS)"
+	$(DOCKER_RUN) -c "$(MAKE) plugin-build-linux $(MFLAGS)"
 
 docker-plugin-build:
 	mkdir -p $(PLUGIN_BUILD_DIR)
