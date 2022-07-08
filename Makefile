@@ -17,9 +17,9 @@ export JOBS_CT_NG :=
 endif
 
 RACK_SDK_VERSION := 2.1.2
+DOCKER_IMAGE_VERSION := 3
 
 all: toolchain-all
-
 
 # Toolchain build
 
@@ -114,8 +114,12 @@ $(rack-sdk-lin):
 	rm Rack-SDK-$(RACK_SDK_VERSION)-lin.zip
 RACK_DIR_LIN := $(PWD)/$(rack-sdk-lin)
 
+rack-sdk-clean:
+	rm -rf $(PWD)/Rack-SDK-mac $(PWD)/Rack-SDK-win $(PWD)/Rack-SDK-lin
 
-toolchain-all: toolchain-lin toolchain-win toolchain-mac rack-sdk-mac rack-sdk-win rack-sdk-lin
+rack-sdk-all: rack-sdk-mac rack-sdk-win rack-sdk-lin
+
+toolchain-all: toolchain-lin toolchain-win toolchain-mac rack-sdk-all
 
 
 toolchain-clean:
@@ -223,15 +227,18 @@ dep-arch-linux:
 		help2man
 
 
-docker-build:
-	docker build --build-arg JOBS=$(JOBS) --tag rack-plugin-toolchain:2 .
+docker-build: rack-sdk-all
+	docker build --build-arg JOBS=$(JOBS) --tag rack-plugin-toolchain:$(DOCKER_IMAGE_VERSION) .
 
 
 DOCKER_RUN := docker run --rm --interactive --tty \
 	--volume=$(PLUGIN_DIR):/home/build/plugin-src \
 	--volume=$(PWD)/$(PLUGIN_BUILD_DIR):/home/build/rack-plugin-toolchain/$(PLUGIN_BUILD_DIR) \
+	--volume=$(PWD)/Rack-SDK-mac:/home/build/rack-plugin-toolchain/Rack-SDK-mac \
+	--volume=$(PWD)/Rack-SDK-win:/home/build/rack-plugin-toolchain/Rack-SDK-win \
+	--volume=$(PWD)/Rack-SDK-lin:/home/build/rack-plugin-toolchain/Rack-SDK-lin \
 	--env PLUGIN_DIR=/home/build/plugin-src \
-	rack-plugin-toolchain:2 \
+	rack-plugin-toolchain:$(DOCKER_IMAGE_VERSION) \
 	/bin/bash
 
 docker-run:

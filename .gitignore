@@ -1,5 +1,5 @@
 MacOSX*.sdk.tar.*
 local/
 plugin-build/
-Rack-SDK/
+Rack-SDK-*/
 osxcross/

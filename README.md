@@ -68,6 +68,19 @@ You may replace 8 with your desired number of parallel jobs, such as your number
 
 Built plugin packages are placed in the `plugin-build/` directory.
 
+### Rack SDK management
+
+The latest Rack SDKs for all supported platforms are downloaded during the toolchain build.
+
+The SDKs can be updated to the latest version (defined in the `Makefile`) as follows:
+
+```
+make rack-sdk-clean
+make rack-sdk-all
+```
+
+This is especially convenient for the Docker-based toolchain, because it does not require to rebuild the entire toolchain to update to the latest SDK.
+
 ## Acknowledgments
 
 Thanks to @cschol for help with crosstool-ng, Ubuntu, Docker, and testing.
