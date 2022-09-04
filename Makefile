@@ -17,7 +17,7 @@ export JOBS_CT_NG :=
 endif
 
 RACK_SDK_VERSION := 2.1.2
-DOCKER_IMAGE_VERSION := 3
+DOCKER_IMAGE_VERSION := 4
 
 all: toolchain-all
 
@@ -27,7 +27,7 @@ all: toolchain-all
 crosstool-ng := $(LOCAL_DIR)/bin/ct-ng
 $(crosstool-ng):
 	git clone https://github.com/crosstool-ng/crosstool-ng.git
-	cd crosstool-ng && git checkout 02d1503f6769be4ad8058b393d4245febced459f
+	cd crosstool-ng && git checkout crosstool-ng-1.25.0
 	cd crosstool-ng && ./bootstrap
 	cd crosstool-ng && ./configure --prefix="$(LOCAL_DIR)"
 	cd crosstool-ng && make -j $(JOBS)
@@ -38,9 +38,6 @@ $(crosstool-ng):
 toolchain-lin := $(LOCAL_DIR)/x86_64-ubuntu16.04-linux-gnu
 toolchain-lin: $(toolchain-lin)
 $(toolchain-lin): $(crosstool-ng)
-	# HACK until crosstool-ng has fixed its mirror for isl library
-	mkdir -p .build/tarballs
-	cd .build/tarballs && wget http://deb.debian.org/debian/pool/main/i/isl/isl_0.24.orig.tar.xz && mv isl_0.24.orig.tar.xz isl-0.24.tar.xz
 	ct-ng x86_64-ubuntu16.04-linux-gnu
 	CT_PREFIX="$(LOCAL_DIR)" ct-ng build$(JOBS_CT_NG)
 	rm -rf .build .config build.log
@@ -53,9 +50,6 @@ $(toolchain-lin): $(crosstool-ng)
 toolchain-win := $(LOCAL_DIR)/x86_64-w64-mingw32
 toolchain-win: $(toolchain-win)
 $(toolchain-win): $(crosstool-ng)
-	# HACK until crosstool-ng has fixed its mirror for isl library
-	mkdir -p .build/tarballs
-	cd .build/tarballs && wget http://deb.debian.org/debian/pool/main/i/isl/isl_0.24.orig.tar.xz && mv isl_0.24.orig.tar.xz isl-0.24.tar.xz
 	ct-ng x86_64-w64-mingw32
 	CT_PREFIX="$(LOCAL_DIR)" ct-ng build$(JOBS_CT_NG)
 	rm -rf .build .config build.log /home/build/src
