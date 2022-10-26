@@ -109,7 +109,7 @@ $(rack-sdk-lin):
 RACK_DIR_LIN := $(PWD)/$(rack-sdk-lin)
 
 rack-sdk-clean:
-	rm -rf $(PWD)/Rack-SDK-mac $(PWD)/Rack-SDK-win $(PWD)/Rack-SDK-lin
+	rm -rf Rack-SDK-mac Rack-SDK-win Rack-SDK-lin
 
 rack-sdk-all: rack-sdk-mac rack-sdk-win rack-sdk-lin
 
