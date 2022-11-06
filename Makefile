@@ -27,7 +27,8 @@ all: toolchain-all
 crosstool-ng := $(LOCAL_DIR)/bin/ct-ng
 $(crosstool-ng):
 	git clone https://github.com/crosstool-ng/crosstool-ng.git
-	cd crosstool-ng && git checkout crosstool-ng-1.25.0
+	# Use development version to avoid zlib issue until proper release is available
+	cd crosstool-ng && git checkout 82346dd7dfe7ed20dc8ec71e193c2d3b1930e22d
 	cd crosstool-ng && ./bootstrap
 	cd crosstool-ng && ./configure --prefix="$(LOCAL_DIR)"
 	cd crosstool-ng && make -j $(JOBS)
