@@ -3,3 +3,5 @@ local/
 plugin-build/
 Rack-SDK-*/
 osxcross/
+*.log
+.config*

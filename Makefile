@@ -121,7 +121,7 @@ toolchain-all: toolchain-lin toolchain-win toolchain-mac rack-sdk-all
 
 
 toolchain-clean:
-	rm -rf local osxcross $(rack-sdk-mac) $(rack-sdk-win) $(rack-sdk-lin)
+	rm -rf .build local osxcross $(rack-sdk-mac) $(rack-sdk-win) $(rack-sdk-lin)
 
 
 # Plugin build
