@@ -189,7 +189,8 @@ plugin-build-mac-x64 plugin-build-mac-arm64 plugin-build-win-x64 plugin-build-li
 
 plugin-build:
 	$(MAKE) plugin-build-mac-x64
-	$(MAKE) plugin-build-mac-arm64
+# FIXME Disabled until Rack SDK is updated.
+#	$(MAKE) plugin-build-mac-arm64
 	$(MAKE) plugin-build-win-x64
 	$(MAKE) plugin-build-linux-x64
 
