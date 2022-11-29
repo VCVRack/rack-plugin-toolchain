@@ -16,8 +16,8 @@ export JOBS :=
 export JOBS_CT_NG :=
 endif
 
-RACK_SDK_VERSION := 2.1.2
-DOCKER_IMAGE_VERSION := 5
+RACK_SDK_VERSION := 2.2.0
+DOCKER_IMAGE_VERSION := 6
 
 all: toolchain-all
 
@@ -78,6 +78,9 @@ $(toolchain-mac):
 	cp MacOSX11.1.sdk.tar.* osxcross/tarballs/
 	cd osxcross && PATH="$(LOCAL_DIR)/bin:$(PATH)" UNATTENDED=1 TARGET_DIR="$(LOCAL_DIR)/osxcross" JOBS=$(JOBS) ./build.sh
 
+	# Build compiler-rt
+	cd osxcross && ENABLE_COMPILER_RT_INSTALL=1 JOBS=$(JOBS) ./build_compiler_rt.sh
+
 	# Build Mac version of binutils and build LLVM gold
 	cd osxcross && BINUTILS_VERSION=$(MAC_BINUTILS_VERSION) TARGET_DIR="$(LOCAL_DIR)/osxcross" JOBS=$(JOBS) ./build_binutils.sh
 	cd osxcross/build/llvm-$(MAC_CLANG_VERSION).src/build && cmake .. -DLLVM_BINUTILS_INCDIR=$(PWD)/osxcross/build/binutils-$(MAC_BINUTILS_VERSION)/include && make install -j $(JOBS)
@@ -85,43 +88,52 @@ $(toolchain-mac):
 	rm -rf osxcross
 
 
-rack-sdk-mac := Rack-SDK-mac
-rack-sdk-mac: $(rack-sdk-mac)
-$(rack-sdk-mac):
-	wget -c "https://vcvrack.com/downloads/Rack-SDK-$(RACK_SDK_VERSION)-mac.zip"
-	unzip Rack-SDK-$(RACK_SDK_VERSION)-mac.zip
-	mv Rack-SDK Rack-SDK-mac
-	rm Rack-SDK-$(RACK_SDK_VERSION)-mac.zip
-RACK_DIR_MAC := $(PWD)/$(rack-sdk-mac)
+rack-sdk-mac-x64 := Rack-SDK-mac-x64
+rack-sdk-mac-x64: $(rack-sdk-mac-x64)
+$(rack-sdk-mac-x64):
+	wget -c "https://vcvrack.com/downloads/Rack-SDK-$(RACK_SDK_VERSION)-mac-x64.zip"
+	unzip Rack-SDK-$(RACK_SDK_VERSION)-mac-x64.zip
+	mv Rack-SDK Rack-SDK-mac-x64
+	rm Rack-SDK-$(RACK_SDK_VERSION)-mac-x64.zip
+RACK_DIR_MAC_X64 := $(PWD)/$(rack-sdk-mac-x64)
 
-rack-sdk-win := Rack-SDK-win
-rack-sdk-win: $(rack-sdk-win)
-$(rack-sdk-win):
-	wget -c "https://vcvrack.com/downloads/Rack-SDK-$(RACK_SDK_VERSION)-win.zip"
-	unzip Rack-SDK-$(RACK_SDK_VERSION)-win.zip
-	mv Rack-SDK Rack-SDK-win
-	rm Rack-SDK-$(RACK_SDK_VERSION)-win.zip
-RACK_DIR_WIN := $(PWD)/$(rack-sdk-win)
+rack-sdk-mac-arm64 := Rack-SDK-mac-arm64
+rack-sdk-mac-arm64: $(rack-sdk-mac-arm64)
+$(rack-sdk-mac-arm64):
+	wget -c "https://vcvrack.com/downloads/Rack-SDK-$(RACK_SDK_VERSION)-mac-arm64.zip"
+	unzip Rack-SDK-$(RACK_SDK_VERSION)-mac-arm64.zip
+	mv Rack-SDK Rack-SDK-mac-arm64
+	rm Rack-SDK-$(RACK_SDK_VERSION)-mac-arm64.zip
+RACK_DIR_MAC_ARM64 := $(PWD)/$(rack-sdk-mac-arm64)
 
-rack-sdk-lin := Rack-SDK-lin
-rack-sdk-lin: $(rack-sdk-lin)
-$(rack-sdk-lin):
-	wget -c "https://vcvrack.com/downloads/Rack-SDK-$(RACK_SDK_VERSION)-lin.zip"
-	unzip Rack-SDK-$(RACK_SDK_VERSION)-lin.zip
-	mv Rack-SDK Rack-SDK-lin
-	rm Rack-SDK-$(RACK_SDK_VERSION)-lin.zip
-RACK_DIR_LIN := $(PWD)/$(rack-sdk-lin)
+rack-sdk-win-x64 := Rack-SDK-win-x64
+rack-sdk-win-x64: $(rack-sdk-win-x64)
+$(rack-sdk-win-x64):
+	wget -c "https://vcvrack.com/downloads/Rack-SDK-$(RACK_SDK_VERSION)-win-x64.zip"
+	unzip Rack-SDK-$(RACK_SDK_VERSION)-win-x64.zip
+	mv Rack-SDK Rack-SDK-win-x64
+	rm Rack-SDK-$(RACK_SDK_VERSION)-win-x64.zip
+RACK_DIR_WIN_X64 := $(PWD)/$(rack-sdk-win-x64)
+
+rack-sdk-lin-x64 := Rack-SDK-lin-x64
+rack-sdk-lin-x64: $(rack-sdk-lin-x64)
+$(rack-sdk-lin-x64):
+	wget -c "https://vcvrack.com/downloads/Rack-SDK-$(RACK_SDK_VERSION)-lin-x64.zip"
+	unzip Rack-SDK-$(RACK_SDK_VERSION)-lin-x64.zip
+	mv Rack-SDK Rack-SDK-lin-x64
+	rm Rack-SDK-$(RACK_SDK_VERSION)-lin-x64.zip
+RACK_DIR_LIN_X64 := $(PWD)/$(rack-sdk-lin-x64)
 
 rack-sdk-clean:
-	rm -rf Rack-SDK-mac Rack-SDK-win Rack-SDK-lin
+	rm -rf $(rack-sdk-mac-x64) $(rack-sdk-mac-arm64) $(rack-sdk-win-x64) $(rack-sdk-lin-x64)
 
-rack-sdk-all: rack-sdk-mac rack-sdk-win rack-sdk-lin
+rack-sdk-all: rack-sdk-mac-x64 rack-sdk-mac-arm64 rack-sdk-win-x64 rack-sdk-lin-x64
 
 toolchain-all: toolchain-lin toolchain-win toolchain-mac rack-sdk-all
 
 
 toolchain-clean:
-	rm -rf .build local osxcross $(rack-sdk-mac) $(rack-sdk-win) $(rack-sdk-lin)
+	rm -rf .build local osxcross $(rack-sdk-mac-x64) $(rack-sdk-win-x64) $(rack-sdk-lin-x64)
 
 
 # Plugin build
@@ -131,32 +143,41 @@ PLUGIN_BUILD_DIR := plugin-build
 PLUGIN_DIR ?=
 
 
-plugin-build-mac: export PATH := $(LOCAL_DIR)/osxcross/bin:$(PATH)
-plugin-build-mac: export CC := x86_64-apple-darwin20.2-clang
-plugin-build-mac: export CXX := x86_64-apple-darwin20.2-clang++-libc++
-plugin-build-mac: export STRIP := x86_64-apple-darwin20.2-strip
-plugin-build-mac: export INSTALL_NAME_TOOL := x86_64-apple-darwin20.2-install_name_tool
-plugin-build-mac: export OTOOL := x86_64-apple-darwin20.2-otool
+plugin-build-mac-x64: export PATH := $(LOCAL_DIR)/osxcross/bin:$(PATH)
+plugin-build-mac-x64: export CC := x86_64-apple-darwin20.2-clang
+plugin-build-mac-x64: export CXX := x86_64-apple-darwin20.2-clang++-libc++
+plugin-build-mac-x64: export STRIP := x86_64-apple-darwin20.2-strip
+plugin-build-mac-x64: export INSTALL_NAME_TOOL := x86_64-apple-darwin20.2-install_name_tool
+plugin-build-mac-x64: export OTOOL := x86_64-apple-darwin20.2-otool
 
 
-plugin-build-win: export PATH := $(LOCAL_DIR)/x86_64-w64-mingw32/bin:$(PATH)
-plugin-build-win: export CC := x86_64-w64-mingw32-gcc
-plugin-build-win: export CXX := x86_64-w64-mingw32-g++
-plugin-build-win: export STRIP := x86_64-w64-mingw32-strip
+plugin-build-mac-arm64: export PATH := $(LOCAL_DIR)/osxcross/bin:$(PATH)
+plugin-build-mac-arm64: export CC := arm64-apple-darwin20.2-clang
+plugin-build-mac-arm64: export CXX := arm64-apple-darwin20.2-clang++-libc++
+plugin-build-mac-arm64: export STRIP := arm64-apple-darwin20.2-strip
+plugin-build-mac-arm64: export INSTALL_NAME_TOOL := arm64-apple-darwin20.2-install_name_tool
+plugin-build-mac-arm64: export OTOOL := arm64-apple-darwin20.2-otool
 
 
-plugin-build-linux: export PATH:=$(LOCAL_DIR)/x86_64-ubuntu16.04-linux-gnu/bin:$(PATH)
-plugin-build-linux: export CC := x86_64-ubuntu16.04-linux-gnu-gcc
-plugin-build-linux: export CXX := x86_64-ubuntu16.04-linux-gnu-g++
-plugin-build-linux: export STRIP := x86_64-ubuntu16.04-linux-gnu-strip
+plugin-build-win-x64: export PATH := $(LOCAL_DIR)/x86_64-w64-mingw32/bin:$(PATH)
+plugin-build-win-x64: export CC := x86_64-w64-mingw32-gcc
+plugin-build-win-x64: export CXX := x86_64-w64-mingw32-g++
+plugin-build-win-x64: export STRIP := x86_64-w64-mingw32-strip
 
 
-plugin-build-mac: export RACK_DIR := $(RACK_DIR_MAC)
-plugin-build-win: export RACK_DIR := $(RACK_DIR_WIN)
-plugin-build-linux: export RACK_DIR := $(RACK_DIR_LIN)
+plugin-build-linux-x64: export PATH:=$(LOCAL_DIR)/x86_64-ubuntu16.04-linux-gnu/bin:$(PATH)
+plugin-build-linux-x64: export CC := x86_64-ubuntu16.04-linux-gnu-gcc
+plugin-build-linux-x64: export CXX := x86_64-ubuntu16.04-linux-gnu-g++
+plugin-build-linux-x64: export STRIP := x86_64-ubuntu16.04-linux-gnu-strip
 
 
-plugin-build-mac plugin-build-win plugin-build-linux:
+plugin-build-mac-x64: export RACK_DIR := $(RACK_DIR_MAC_X64)
+plugin-build-mac-arm64: export RACK_DIR := $(RACK_DIR_MAC_ARM64)
+plugin-build-win-x64: export RACK_DIR := $(RACK_DIR_WIN_X64)
+plugin-build-linux-x64: export RACK_DIR := $(RACK_DIR_LIN_X64)
+
+
+plugin-build-mac-x64 plugin-build-mac-arm64 plugin-build-win-x64 plugin-build-linux-x64:
 	cd $(PLUGIN_DIR) && $(MAKE) clean
 	cd $(PLUGIN_DIR) && $(MAKE) cleandep
 	cd $(PLUGIN_DIR) && $(MAKE) dep
@@ -167,9 +188,10 @@ plugin-build-mac plugin-build-win plugin-build-linux:
 
 
 plugin-build:
-	$(MAKE) plugin-build-mac
-	$(MAKE) plugin-build-win
-	$(MAKE) plugin-build-linux
+	$(MAKE) plugin-build-mac-x64
+	$(MAKE) plugin-build-mac-arm64
+	$(MAKE) plugin-build-win-x64
+	$(MAKE) plugin-build-linux-x64
 
 
 plugin-build-clean:
@@ -232,9 +254,10 @@ docker-build: rack-sdk-all
 DOCKER_RUN := docker run --rm --interactive --tty \
 	--volume=$(PLUGIN_DIR):/home/build/plugin-src \
 	--volume=$(PWD)/$(PLUGIN_BUILD_DIR):/home/build/rack-plugin-toolchain/$(PLUGIN_BUILD_DIR) \
-	--volume=$(PWD)/Rack-SDK-mac:/home/build/rack-plugin-toolchain/Rack-SDK-mac \
-	--volume=$(PWD)/Rack-SDK-win:/home/build/rack-plugin-toolchain/Rack-SDK-win \
-	--volume=$(PWD)/Rack-SDK-lin:/home/build/rack-plugin-toolchain/Rack-SDK-lin \
+	--volume=$(PWD)/Rack-SDK-mac-x64:/home/build/rack-plugin-toolchain/Rack-SDK-mac-x64 \
+	--volume=$(PWD)/Rack-SDK-mac-arm64:/home/build/rack-plugin-toolchain/Rack-SDK-mac-arm64 \
+	--volume=$(PWD)/Rack-SDK-win-x64:/home/build/rack-plugin-toolchain/Rack-SDK-win-x64 \
+	--volume=$(PWD)/Rack-SDK-lin-x64:/home/build/rack-plugin-toolchain/Rack-SDK-lin-x64 \
 	--env PLUGIN_DIR=/home/build/plugin-src \
 	rack-plugin-toolchain:$(DOCKER_IMAGE_VERSION) \
 	/bin/bash
@@ -242,17 +265,21 @@ DOCKER_RUN := docker run --rm --interactive --tty \
 docker-run:
 	$(DOCKER_RUN)
 
-docker-plugin-build-mac:
+docker-plugin-build-mac-x64:
 	mkdir -p $(PLUGIN_BUILD_DIR)
-	$(DOCKER_RUN) -c "$(MAKE) plugin-build-mac $(MFLAGS)"
+	$(DOCKER_RUN) -c "$(MAKE) plugin-build-mac-x64 $(MFLAGS)"
 
-docker-plugin-build-win:
+docker-plugin-build-mac-arm64:
 	mkdir -p $(PLUGIN_BUILD_DIR)
-	$(DOCKER_RUN) -c "$(MAKE) plugin-build-win $(MFLAGS)"
+	$(DOCKER_RUN) -c "$(MAKE) plugin-build-mac-arm64 $(MFLAGS)"
 
-docker-plugin-build-lin:
+docker-plugin-build-win-x64:
 	mkdir -p $(PLUGIN_BUILD_DIR)
-	$(DOCKER_RUN) -c "$(MAKE) plugin-build-linux $(MFLAGS)"
+	$(DOCKER_RUN) -c "$(MAKE) plugin-build-win-x64 $(MFLAGS)"
+
+docker-plugin-build-lin-x64:
+	mkdir -p $(PLUGIN_BUILD_DIR)
+	$(DOCKER_RUN) -c "$(MAKE) plugin-build-linux-x64 $(MFLAGS)"
 
 docker-plugin-build:
 	mkdir -p $(PLUGIN_BUILD_DIR)
