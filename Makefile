@@ -16,8 +16,8 @@ export JOBS :=
 export JOBS_CT_NG :=
 endif
 
-RACK_SDK_VERSION := 2.2.0
-DOCKER_IMAGE_VERSION := 6
+RACK_SDK_VERSION := 2.2.1
+DOCKER_IMAGE_VERSION := 7
 
 all: toolchain-all
 
@@ -189,8 +189,7 @@ plugin-build-mac-x64 plugin-build-mac-arm64 plugin-build-win-x64 plugin-build-li
 
 plugin-build:
 	$(MAKE) plugin-build-mac-x64
-# FIXME Disabled until Rack SDK is updated.
-#	$(MAKE) plugin-build-mac-arm64
+	$(MAKE) plugin-build-mac-arm64
 	$(MAKE) plugin-build-win-x64
 	$(MAKE) plugin-build-linux-x64
 
