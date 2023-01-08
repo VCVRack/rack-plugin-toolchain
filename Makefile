@@ -17,7 +17,7 @@ export JOBS_CT_NG :=
 endif
 
 RACK_SDK_VERSION := 2.2.2
-DOCKER_IMAGE_VERSION := 7
+DOCKER_IMAGE_VERSION := 8
 
 all: toolchain-all
 
@@ -42,9 +42,10 @@ $(toolchain-lin): $(crosstool-ng)
 	ct-ng x86_64-ubuntu16.04-linux-gnu
 	CT_PREFIX="$(LOCAL_DIR)" ct-ng build$(JOBS_CT_NG)
 	rm -rf .build .config build.log
-	# HACK Copy GL include dir to toolchain sysroot
+	# HACK Copy GL and related include dirs to toolchain sysroot
 	chmod +w $(toolchain-lin)/x86_64-ubuntu16.04-linux-gnu/sysroot/usr/include
 	cp -r /usr/include/GL $(toolchain-lin)/x86_64-ubuntu16.04-linux-gnu/sysroot/usr/include/
+	cp -r /usr/include/KHR $(toolchain-lin)/x86_64-ubuntu16.04-linux-gnu/sysroot/usr/include/
 	chmod -w $(toolchain-lin)/x86_64-ubuntu16.04-linux-gnu/sysroot/usr/include
 
 
