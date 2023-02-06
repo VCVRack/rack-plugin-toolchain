@@ -16,8 +16,8 @@ export JOBS :=
 export JOBS_CT_NG :=
 endif
 
-RACK_SDK_VERSION := 2.2.2
-DOCKER_IMAGE_VERSION := 8
+RACK_SDK_VERSION := 2.2.3
+DOCKER_IMAGE_VERSION := 9
 
 all: toolchain-all
 
@@ -46,6 +46,7 @@ $(toolchain-lin): $(crosstool-ng)
 	chmod +w $(toolchain-lin)/x86_64-ubuntu16.04-linux-gnu/sysroot/usr/include
 	cp -r /usr/include/GL $(toolchain-lin)/x86_64-ubuntu16.04-linux-gnu/sysroot/usr/include/
 	cp -r /usr/include/KHR $(toolchain-lin)/x86_64-ubuntu16.04-linux-gnu/sysroot/usr/include/
+	cp -r /usr/include/X11 $(toolchain-lin)/x86_64-ubuntu16.04-linux-gnu/sysroot/usr/include/
 	chmod -w $(toolchain-lin)/x86_64-ubuntu16.04-linux-gnu/sysroot/usr/include
 
 
