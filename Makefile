@@ -167,19 +167,19 @@ plugin-build-win-x64: export CXX := x86_64-w64-mingw32-g++
 plugin-build-win-x64: export STRIP := x86_64-w64-mingw32-strip
 
 
-plugin-build-linux-x64: export PATH:=$(LOCAL_DIR)/x86_64-ubuntu16.04-linux-gnu/bin:$(PATH)
-plugin-build-linux-x64: export CC := x86_64-ubuntu16.04-linux-gnu-gcc
-plugin-build-linux-x64: export CXX := x86_64-ubuntu16.04-linux-gnu-g++
-plugin-build-linux-x64: export STRIP := x86_64-ubuntu16.04-linux-gnu-strip
+plugin-build-lin-x64: export PATH:=$(LOCAL_DIR)/x86_64-ubuntu16.04-linux-gnu/bin:$(PATH)
+plugin-build-lin-x64: export CC := x86_64-ubuntu16.04-linux-gnu-gcc
+plugin-build-lin-x64: export CXX := x86_64-ubuntu16.04-linux-gnu-g++
+plugin-build-lin-x64: export STRIP := x86_64-ubuntu16.04-linux-gnu-strip
 
 
 plugin-build-mac-x64: export RACK_DIR := $(RACK_DIR_MAC_X64)
 plugin-build-mac-arm64: export RACK_DIR := $(RACK_DIR_MAC_ARM64)
 plugin-build-win-x64: export RACK_DIR := $(RACK_DIR_WIN_X64)
-plugin-build-linux-x64: export RACK_DIR := $(RACK_DIR_LIN_X64)
+plugin-build-lin-x64: export RACK_DIR := $(RACK_DIR_LIN_X64)
 
 
-plugin-build-mac-x64 plugin-build-mac-arm64 plugin-build-win-x64 plugin-build-linux-x64:
+plugin-build-mac-x64 plugin-build-mac-arm64 plugin-build-win-x64 plugin-build-lin-x64:
 	cd $(PLUGIN_DIR) && $(MAKE) clean
 	cd $(PLUGIN_DIR) && $(MAKE) cleandep
 	cd $(PLUGIN_DIR) && $(MAKE) dep
@@ -191,9 +191,8 @@ plugin-build-mac-x64 plugin-build-mac-arm64 plugin-build-win-x64 plugin-build-li
 
 plugin-build:
 	$(MAKE) plugin-build-mac-x64
-	$(MAKE) plugin-build-mac-arm64
 	$(MAKE) plugin-build-win-x64
-	$(MAKE) plugin-build-linux-x64
+	$(MAKE) plugin-build-lin-x64
 
 
 plugin-build-clean:
@@ -281,7 +280,7 @@ docker-plugin-build-win-x64:
 
 docker-plugin-build-lin-x64:
 	mkdir -p $(PLUGIN_BUILD_DIR)
-	$(DOCKER_RUN) -c "$(MAKE) plugin-build-linux-x64 $(MFLAGS)"
+	$(DOCKER_RUN) -c "$(MAKE) plugin-build-lin-x64 $(MFLAGS)"
 
 docker-plugin-build:
 	mkdir -p $(PLUGIN_BUILD_DIR)
