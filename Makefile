@@ -17,7 +17,7 @@ export JOBS_CT_NG :=
 endif
 
 RACK_SDK_VERSION := 2.3.0
-DOCKER_IMAGE_VERSION := 9
+DOCKER_IMAGE_VERSION := 10
 
 all: toolchain-all
 
@@ -66,15 +66,12 @@ MAC_BINUTILS_VERSION := 2.37
 $(toolchain-mac): export PATH := $(LOCAL_DIR)/osxcross/bin:$(PATH)
 $(toolchain-mac):
 	# Download osxcross
-	#git clone "https://github.com/tpoechtrager/osxcross.git" osxcross
-	#cd osxcross && git checkout 0f87f567dfaf98460244471ad6c0f4311d62079c
-	# FIXME Switch to my own branch for now until clang build fix is merged into osxcross
 	git clone "https://github.com/cschol/osxcross.git" osxcross
-	cd osxcross && git checkout 70181533b0af841336feb7f74ca1e3a7a81c9065
+	cd osxcross && git checkout 12f179126df156fb65515cccf140f4b634967baa
 
 	# Build clang
 	cd osxcross && UNATTENDED=1 DISABLE_BOOTSTRAP=1 INSTALLPREFIX="$(LOCAL_DIR)" CLANG_VERSION=$(MAC_CLANG_VERSION) OCDEBUG=1 JOBS=$(JOBS) ./build_clang.sh
-	cd osxcross/build/llvm-$(MAC_CLANG_VERSION).src/build && make install -j $(JOBS)
+	cd osxcross/build/build_stage && make install -j $(JOBS)
 
 	# Build osxcross
 	cp MacOSX11.1.sdk.tar.* osxcross/tarballs/
@@ -85,7 +82,7 @@ $(toolchain-mac):
 
 	# Build Mac version of binutils and build LLVM gold
 	cd osxcross && BINUTILS_VERSION=$(MAC_BINUTILS_VERSION) TARGET_DIR="$(LOCAL_DIR)/osxcross" JOBS=$(JOBS) ./build_binutils.sh
-	cd osxcross/build/llvm-$(MAC_CLANG_VERSION).src/build && cmake .. -DLLVM_BINUTILS_INCDIR=$(PWD)/osxcross/build/binutils-$(MAC_BINUTILS_VERSION)/include && make install -j $(JOBS)
+	cd osxcross/build/build_stage && cmake . -DLLVM_BINUTILS_INCDIR=$(PWD)/osxcross/build/binutils-$(MAC_BINUTILS_VERSION)/include && make install -j $(JOBS)
 
 	rm -rf osxcross
 
@@ -239,7 +236,8 @@ dep-ubuntu:
 		perl \
 		coreutils \
 		zstd \
-		markdown
+		markdown \
+		libarchive-tools
 
 
 dep-arch-linux:
