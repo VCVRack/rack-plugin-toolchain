@@ -60,8 +60,8 @@ $(toolchain-win): $(crosstool-ng)
 
 toolchain-mac := $(LOCAL_DIR)/osxcross
 toolchain-mac: $(toolchain-mac)
-MAC_CLANG_VERSION := 12.0.1
-MAC_BINUTILS_VERSION := 2.37
+#MAC_CLANG_VERSION := 12.0.1
+#MAC_BINUTILS_VERSION := 2.37
 # Binaries from ./build.sh must be available in order to run ./build_binutils.sh
 $(toolchain-mac): export PATH := $(LOCAL_DIR)/osxcross/bin:$(PATH)
 $(toolchain-mac):
@@ -70,19 +70,19 @@ $(toolchain-mac):
 	cd osxcross && git checkout 12f179126df156fb65515cccf140f4b634967baa
 
 	# Build clang
-	cd osxcross && UNATTENDED=1 DISABLE_BOOTSTRAP=1 INSTALLPREFIX="$(LOCAL_DIR)" CLANG_VERSION=$(MAC_CLANG_VERSION) OCDEBUG=1 JOBS=$(JOBS) ./build_clang.sh
-	cd osxcross/build/build_stage && make install -j $(JOBS)
+	#cd osxcross && UNATTENDED=1 DISABLE_BOOTSTRAP=1 INSTALLPREFIX="$(LOCAL_DIR)" CLANG_VERSION=$(MAC_CLANG_VERSION) OCDEBUG=1 JOBS=$(JOBS) ./build_clang.sh
+	#cd osxcross/build/build_stage && make install -j $(JOBS)
 
 	# Build osxcross
 	cp MacOSX11.1.sdk.tar.* osxcross/tarballs/
 	cd osxcross && PATH="$(LOCAL_DIR)/bin:$(PATH)" UNATTENDED=1 TARGET_DIR="$(LOCAL_DIR)/osxcross" JOBS=$(JOBS) ./build.sh
 
 	# Build compiler-rt
-	cd osxcross && ENABLE_COMPILER_RT_INSTALL=1 JOBS=$(JOBS) ./build_compiler_rt.sh
+	#cd osxcross && ENABLE_COMPILER_RT_INSTALL=1 JOBS=$(JOBS) ./build_compiler_rt.sh
 
 	# Build Mac version of binutils and build LLVM gold
-	cd osxcross && BINUTILS_VERSION=$(MAC_BINUTILS_VERSION) TARGET_DIR="$(LOCAL_DIR)/osxcross" JOBS=$(JOBS) ./build_binutils.sh
-	cd osxcross/build/build_stage && cmake . -DLLVM_BINUTILS_INCDIR=$(PWD)/osxcross/build/binutils-$(MAC_BINUTILS_VERSION)/include && make install -j $(JOBS)
+	#cd osxcross && BINUTILS_VERSION=$(MAC_BINUTILS_VERSION) TARGET_DIR="$(LOCAL_DIR)/osxcross" JOBS=$(JOBS) ./build_binutils.sh
+	#cd osxcross/build/build_stage && cmake . -DLLVM_BINUTILS_INCDIR=$(PWD)/osxcross/build/binutils-$(MAC_BINUTILS_VERSION)/include && make install -j $(JOBS)
 
 	rm -rf osxcross
 
@@ -241,10 +241,23 @@ dep-ubuntu:
 
 
 dep-arch-linux:
-	# TODO Complete this list
-	sudo pacman -S --needed \
-		wget \
-		help2man
+	pacman -S --noconfirm --needed \
+		git \
+		cmake \
+		patch \
+		clang \
+		python3 \
+		automake \
+		help2man \
+		texinfo \
+		libtool \
+		jq \
+		rsync \
+		autoconf \
+		flex \
+		bison \
+		which \
+		unzip
 
 
 docker-build: rack-sdk-all
