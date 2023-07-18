@@ -26,9 +26,9 @@ all: toolchain-all
 
 crosstool-ng := $(LOCAL_DIR)/bin/ct-ng
 $(crosstool-ng):
-	git clone https://github.com/crosstool-ng/crosstool-ng.git
-	# Use development version to avoid zlib issue until proper release is available
-	cd crosstool-ng && git checkout 82346dd7dfe7ed20dc8ec71e193c2d3b1930e22d
+	# FIXME Use development version until fix for hanging build is merged to crosstool-ng repository.
+	git clone https://github.com/cpackham/crosstool-ng.git
+	cd crosstool-ng && git checkout a7835a0251e5acdb38d7cbf301457058266bcbca
 	cd crosstool-ng && ./bootstrap
 	cd crosstool-ng && ./configure --prefix="$(LOCAL_DIR)"
 	cd crosstool-ng && make -j $(JOBS)
@@ -60,18 +60,11 @@ $(toolchain-win): $(crosstool-ng)
 
 toolchain-mac := $(LOCAL_DIR)/osxcross
 toolchain-mac: $(toolchain-mac)
-#MAC_CLANG_VERSION := 12.0.1
-#MAC_BINUTILS_VERSION := 2.37
-# Binaries from ./build.sh must be available in order to run ./build_binutils.sh
 $(toolchain-mac): export PATH := $(LOCAL_DIR)/osxcross/bin:$(PATH)
 $(toolchain-mac):
 	# Download osxcross
 	git clone "https://github.com/cschol/osxcross.git" osxcross
 	cd osxcross && git checkout 12f179126df156fb65515cccf140f4b634967baa
-
-	# Build clang
-	#cd osxcross && UNATTENDED=1 DISABLE_BOOTSTRAP=1 INSTALLPREFIX="$(LOCAL_DIR)" CLANG_VERSION=$(MAC_CLANG_VERSION) OCDEBUG=1 JOBS=$(JOBS) ./build_clang.sh
-	#cd osxcross/build/build_stage && make install -j $(JOBS)
 
 	# Build osxcross
 	cp MacOSX11.1.sdk.tar.* osxcross/tarballs/
@@ -257,7 +250,12 @@ dep-arch-linux:
 		flex \
 		bison \
 		which \
-		unzip
+		unzip \
+		wget \
+		glu \
+		libx11 \
+		mesa
+
 
 
 docker-build: rack-sdk-all
