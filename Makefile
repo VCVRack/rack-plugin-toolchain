@@ -16,7 +16,6 @@ export JOBS :=
 export JOBS_CT_NG :=
 endif
 
-RACK_SDK_VERSION := 2.3.0
 DOCKER_IMAGE_VERSION := 10
 
 all: toolchain-all
@@ -82,37 +81,37 @@ $(toolchain-mac):
 rack-sdk-mac-x64 := Rack-SDK-mac-x64
 rack-sdk-mac-x64: $(rack-sdk-mac-x64)
 $(rack-sdk-mac-x64):
-	wget -c "https://vcvrack.com/downloads/Rack-SDK-$(RACK_SDK_VERSION)-mac-x64.zip"
-	unzip Rack-SDK-$(RACK_SDK_VERSION)-mac-x64.zip
+	wget --continue --content-disposition "https://vcvrack.com/downloads/Rack-SDK-latest-mac-x64.zip"
+	unzip Rack-SDK-*-mac-x64.zip
 	mv Rack-SDK Rack-SDK-mac-x64
-	rm Rack-SDK-$(RACK_SDK_VERSION)-mac-x64.zip
+	rm Rack-SDK-*-mac-x64.zip
 RACK_DIR_MAC_X64 := $(PWD)/$(rack-sdk-mac-x64)
 
 rack-sdk-mac-arm64 := Rack-SDK-mac-arm64
 rack-sdk-mac-arm64: $(rack-sdk-mac-arm64)
 $(rack-sdk-mac-arm64):
-	wget -c "https://vcvrack.com/downloads/Rack-SDK-$(RACK_SDK_VERSION)-mac-arm64.zip"
-	unzip Rack-SDK-$(RACK_SDK_VERSION)-mac-arm64.zip
+	wget --continue --content-disposition "https://vcvrack.com/downloads/Rack-SDK-latest-mac-arm64.zip"
+	unzip Rack-SDK-*-mac-arm64.zip
 	mv Rack-SDK Rack-SDK-mac-arm64
-	rm Rack-SDK-$(RACK_SDK_VERSION)-mac-arm64.zip
+	rm Rack-SDK-*-mac-arm64.zip
 RACK_DIR_MAC_ARM64 := $(PWD)/$(rack-sdk-mac-arm64)
 
 rack-sdk-win-x64 := Rack-SDK-win-x64
 rack-sdk-win-x64: $(rack-sdk-win-x64)
 $(rack-sdk-win-x64):
-	wget -c "https://vcvrack.com/downloads/Rack-SDK-$(RACK_SDK_VERSION)-win-x64.zip"
-	unzip Rack-SDK-$(RACK_SDK_VERSION)-win-x64.zip
+	wget --continue --content-disposition "https://vcvrack.com/downloads/Rack-SDK-latest-win-x64.zip"
+	unzip Rack-SDK-*-win-x64.zip
 	mv Rack-SDK Rack-SDK-win-x64
-	rm Rack-SDK-$(RACK_SDK_VERSION)-win-x64.zip
+	rm Rack-SDK-*-win-x64.zip
 RACK_DIR_WIN_X64 := $(PWD)/$(rack-sdk-win-x64)
 
 rack-sdk-lin-x64 := Rack-SDK-lin-x64
 rack-sdk-lin-x64: $(rack-sdk-lin-x64)
 $(rack-sdk-lin-x64):
-	wget -c "https://vcvrack.com/downloads/Rack-SDK-$(RACK_SDK_VERSION)-lin-x64.zip"
-	unzip Rack-SDK-$(RACK_SDK_VERSION)-lin-x64.zip
+	wget --continue --content-disposition "https://vcvrack.com/downloads/Rack-SDK-latest-lin-x64.zip"
+	unzip Rack-SDK-*-lin-x64.zip
 	mv Rack-SDK Rack-SDK-lin-x64
-	rm Rack-SDK-$(RACK_SDK_VERSION)-lin-x64.zip
+	rm Rack-SDK-*-lin-x64.zip
 RACK_DIR_LIN_X64 := $(PWD)/$(rack-sdk-lin-x64)
 
 rack-sdk-clean:
