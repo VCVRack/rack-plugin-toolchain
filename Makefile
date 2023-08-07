@@ -68,12 +68,11 @@ $(toolchain-mac):
 	cp MacOSX11.1.sdk.tar.* osxcross/tarballs/
 	cd osxcross && PATH="$(LOCAL_DIR)/bin:$(PATH)" UNATTENDED=1 TARGET_DIR="$(LOCAL_DIR)/osxcross" JOBS=$(JOBS) ./build.sh
 
-	# Build compiler-rt
-	#cd osxcross && ENABLE_COMPILER_RT_INSTALL=1 JOBS=$(JOBS) ./build_compiler_rt.sh
-
-	# Build Mac version of binutils and build LLVM gold
-	#cd osxcross && BINUTILS_VERSION=$(MAC_BINUTILS_VERSION) TARGET_DIR="$(LOCAL_DIR)/osxcross" JOBS=$(JOBS) ./build_binutils.sh
-	#cd osxcross/build/build_stage && cmake . -DLLVM_BINUTILS_INCDIR=$(PWD)/osxcross/build/binutils-$(MAC_BINUTILS_VERSION)/include && make install -j $(JOBS)
+	# Download rcodesign binary to ad-hoc sign arm64 plugin builds on Linux
+	wget --continue https://github.com/indygreg/apple-platform-rs/releases/download/apple-codesign%2F0.22.0/apple-codesign-0.22.0-x86_64-unknown-linux-musl.tar.gz
+	tar xvf apple-codesign-0.22.0-x86_64-unknown-linux-musl.tar.gz
+	cp ./apple-codesign-0.22.0-x86_64-unknown-linux-musl/rcodesign $(LOCAL_DIR)/osxcross/bin/
+	rm -f apple-codesign-0.22.0-x86_64-unknown-linux-musl.tar.gz
 
 	rm -rf osxcross
 
@@ -147,6 +146,7 @@ plugin-build-mac-arm64: export CXX := arm64-apple-darwin20.2-clang++-libc++
 plugin-build-mac-arm64: export STRIP := arm64-apple-darwin20.2-strip
 plugin-build-mac-arm64: export INSTALL_NAME_TOOL := arm64-apple-darwin20.2-install_name_tool
 plugin-build-mac-arm64: export OTOOL := arm64-apple-darwin20.2-otool
+plugin-build-mac-arm64: export CODESIGN := "rcodesign sign"
 
 
 plugin-build-win-x64: export PATH := $(LOCAL_DIR)/x86_64-w64-mingw32/bin:$(PATH)
