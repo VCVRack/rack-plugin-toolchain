@@ -9,7 +9,7 @@ RUN useradd --create-home --uid 1000 --gid 1000 --shell /bin/bash build
 
 # Install make to run make
 ENV DEBIAN_FRONTEND=noninteractive
-RUN pacman -Suy --noconfirm && pacman -S make --noconfirm
+RUN pacman -Suyy --noconfirm && pacman -S make --noconfirm
 
 # Create toolchain directory
 USER build
