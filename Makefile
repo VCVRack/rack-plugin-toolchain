@@ -234,7 +234,7 @@ dep-ubuntu:
 
 
 dep-arch-linux:
-	pacman -S --noconfirm --needed \
+	pacman -Suyy --noconfirm && pacman -S --noconfirm --needed \
 		git \
 		cmake \
 		patch \
