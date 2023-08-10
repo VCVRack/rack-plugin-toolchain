@@ -56,25 +56,45 @@ $(toolchain-win): $(crosstool-ng)
 	CT_PREFIX="$(LOCAL_DIR)" ct-ng build$(JOBS_CT_NG)
 	rm -rf .build .config build.log /home/build/src
 
+OSXCROSS_CLANG_VERSION := 15.0.7
+OSXCROSS_BINUTILS_VERSION := 2.37
 
 toolchain-mac := $(LOCAL_DIR)/osxcross
 toolchain-mac: $(toolchain-mac)
 $(toolchain-mac): export PATH := $(LOCAL_DIR)/osxcross/bin:$(PATH)
 $(toolchain-mac):
-	# Download osxcross
+	# Obtain osxcross sources.
+	# FIXME Use official osxcross version when workaround from our fork are not required anymore.
 	git clone "https://github.com/cschol/osxcross.git" osxcross
-	cd osxcross && git checkout 12f179126df156fb65515cccf140f4b634967baa
+	cd osxcross && git checkout ae54314c24a959cd90ebb1f3aff3507677d36591
 
-	# Build osxcross
+	# Build a custom clang compiler using the system's gcc compiler.
+	# This enables us to have custom compiler environment needed for cross-compilation.
+	cd osxcross && UNATTENDED=1 INSTALLPREFIX="$(LOCAL_DIR)" GITPROJECT=llvm CLANG_VERSION=$(OSXCROSS_CLANG_VERSION) OCDEBUG=1 ENABLE_CLANG_INSTALL=1 JOBS=$(JOBS) ./build_clang.sh
+
+	## Build osxcross.
 	cp MacOSX11.1.sdk.tar.* osxcross/tarballs/
 	cd osxcross && PATH="$(LOCAL_DIR)/bin:$(PATH)" UNATTENDED=1 TARGET_DIR="$(LOCAL_DIR)/osxcross" JOBS=$(JOBS) ./build.sh
 
-	# Download rcodesign binary to ad-hoc sign arm64 plugin builds on Linux
+	## Build compiler-rt.
+	cd osxcross && ENABLE_COMPILER_RT_INSTALL=1 JOBS=$(JOBS) ./build_compiler_rt.sh
+
+	## Build MacOS binutils and build LLVM gold.
+	cd osxcross && BINUTILS_VERSION=$(OSXCROSS_BINUTILS_VERSION) TARGET_DIR="$(LOCAL_DIR)/osxcross" JOBS=$(JOBS) ./build_binutils.sh
+	cd osxcross/build/build_stage && cmake . -DLLVM_BINUTILS_INCDIR=$(PWD)/osxcross/build/binutils-$(OSXCROSS_BINUTILS_VERSION)/include && make install -j $(JOBS)
+
+	## Download rcodesign binary to ad-hoc sign arm64 plugin builds in a cross-compilation environment.
 	wget --continue "https://github.com/indygreg/apple-platform-rs/releases/download/apple-codesign%2F0.22.0/apple-codesign-0.22.0-x86_64-unknown-linux-musl.tar.gz"
 	tar -xvf apple-codesign-0.22.0-x86_64-unknown-linux-musl.tar.gz
 	rm apple-codesign-0.22.0-x86_64-unknown-linux-musl.tar.gz
 	cp ./apple-codesign-0.22.0-x86_64-unknown-linux-musl/rcodesign $(LOCAL_DIR)/osxcross/bin/
 	rm -r apple-codesign-0.22.0-x86_64-unknown-linux-musl
+
+	# TODO Fix library paths.
+	# Background: clang build adds `x86_64-unknown-linux-gnu` on Arch,
+	# but cross-compilation environment for macOS platform does not expect it.
+	# As a result libcxx-abi.so.1 cannot be found.
+	cp $(LOCAL_DIR)/lib/x86_64-unknown-linux-gnu/* $(LOCAL_DIR)/lib/
 
 	rm -rf osxcross
 
@@ -235,10 +255,10 @@ dep-ubuntu:
 
 dep-arch-linux:
 	pacman -Suyy --noconfirm && pacman -S --noconfirm --needed \
+		gcc \
 		git \
 		cmake \
 		patch \
-		clang \
 		python3 \
 		automake \
 		help2man \
