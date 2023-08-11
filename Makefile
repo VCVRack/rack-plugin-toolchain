@@ -19,9 +19,14 @@ endif
 RACK_SDK_VERSION := 2.4.0
 DOCKER_IMAGE_VERSION := 10
 
-all: toolchain-all
+
+all: toolchain-all rack-sdk-all
+
 
 # Toolchain build
+
+
+toolchain-all: toolchain-lin toolchain-win toolchain-mac
 
 
 crosstool-ng := $(LOCAL_DIR)/bin/ct-ng
@@ -55,6 +60,7 @@ $(toolchain-win): $(crosstool-ng)
 	ct-ng x86_64-w64-mingw32
 	CT_PREFIX="$(LOCAL_DIR)" ct-ng build$(JOBS_CT_NG)
 	rm -rf .build .config build.log /home/build/src
+
 
 OSXCROSS_CLANG_VERSION := 15.0.7
 OSXCROSS_BINUTILS_VERSION := 2.37
@@ -99,6 +105,16 @@ $(toolchain-mac):
 	rm -rf osxcross
 
 
+toolchain-clean:
+	rm -rf .build local osxcross $(rack-sdk-mac-x64) $(rack-sdk-win-x64) $(rack-sdk-lin-x64) $(rack-sdk-mac-arm64)
+
+
+# Rack SDK
+
+
+rack-sdk-all: rack-sdk-mac-x64 rack-sdk-mac-arm64 rack-sdk-win-x64 rack-sdk-lin-x64
+
+
 rack-sdk-mac-x64 := Rack-SDK-mac-x64
 rack-sdk-mac-x64: $(rack-sdk-mac-x64)
 $(rack-sdk-mac-x64):
@@ -107,6 +123,7 @@ $(rack-sdk-mac-x64):
 	mv Rack-SDK Rack-SDK-mac-x64
 	rm Rack-SDK-$(RACK_SDK_VERSION)-mac-x64.zip
 RACK_DIR_MAC_X64 := $(PWD)/$(rack-sdk-mac-x64)
+
 
 rack-sdk-mac-arm64 := Rack-SDK-mac-arm64
 rack-sdk-mac-arm64: $(rack-sdk-mac-arm64)
@@ -117,6 +134,7 @@ $(rack-sdk-mac-arm64):
 	rm Rack-SDK-$(RACK_SDK_VERSION)-mac-arm64.zip
 RACK_DIR_MAC_ARM64 := $(PWD)/$(rack-sdk-mac-arm64)
 
+
 rack-sdk-win-x64 := Rack-SDK-win-x64
 rack-sdk-win-x64: $(rack-sdk-win-x64)
 $(rack-sdk-win-x64):
@@ -125,6 +143,7 @@ $(rack-sdk-win-x64):
 	mv Rack-SDK Rack-SDK-win-x64
 	rm Rack-SDK-$(RACK_SDK_VERSION)-win-x64.zip
 RACK_DIR_WIN_X64 := $(PWD)/$(rack-sdk-win-x64)
+
 
 rack-sdk-lin-x64 := Rack-SDK-lin-x64
 rack-sdk-lin-x64: $(rack-sdk-lin-x64)
@@ -135,16 +154,9 @@ $(rack-sdk-lin-x64):
 	rm Rack-SDK-$(RACK_SDK_VERSION)-lin-x64.zip
 RACK_DIR_LIN_X64 := $(PWD)/$(rack-sdk-lin-x64)
 
+
 rack-sdk-clean:
 	rm -rf $(rack-sdk-mac-x64) $(rack-sdk-mac-arm64) $(rack-sdk-win-x64) $(rack-sdk-lin-x64)
-
-rack-sdk-all: rack-sdk-mac-x64 rack-sdk-mac-arm64 rack-sdk-win-x64 rack-sdk-lin-x64
-
-toolchain-all: toolchain-lin toolchain-win toolchain-mac rack-sdk-all
-
-
-toolchain-clean:
-	rm -rf .build local osxcross $(rack-sdk-mac-x64) $(rack-sdk-win-x64) $(rack-sdk-lin-x64) $(rack-sdk-mac-arm64)
 
 
 # Plugin build
@@ -152,6 +164,13 @@ toolchain-clean:
 
 PLUGIN_BUILD_DIR := plugin-build
 PLUGIN_DIR ?=
+
+
+plugin-build:
+	$(MAKE) plugin-build-mac-x64
+	$(MAKE) plugin-build-mac-arm64
+	$(MAKE) plugin-build-win-x64
+	$(MAKE) plugin-build-lin-x64
 
 
 plugin-build-mac-x64: export PATH := $(LOCAL_DIR)/osxcross/bin:$(PATH)
@@ -197,13 +216,6 @@ plugin-build-mac-x64 plugin-build-mac-arm64 plugin-build-win-x64 plugin-build-li
 	mkdir -p $(PLUGIN_BUILD_DIR)
 	cp $(PLUGIN_DIR)/dist/*.vcvplugin $(PLUGIN_BUILD_DIR)/
 	cd $(PLUGIN_DIR) && $(MAKE) clean
-
-
-plugin-build:
-	$(MAKE) plugin-build-mac-x64
-	$(MAKE) plugin-build-mac-arm64
-	$(MAKE) plugin-build-win-x64
-	$(MAKE) plugin-build-lin-x64
 
 
 plugin-build-clean:
@@ -296,6 +308,10 @@ DOCKER_RUN := docker run --rm --interactive --tty \
 docker-run:
 	$(DOCKER_RUN)
 
+docker-plugin-build:
+	mkdir -p $(PLUGIN_BUILD_DIR)
+	$(DOCKER_RUN) -c "$(MAKE) plugin-build $(MFLAGS)"
+
 docker-plugin-build-mac-x64:
 	mkdir -p $(PLUGIN_BUILD_DIR)
 	$(DOCKER_RUN) -c "$(MAKE) plugin-build-mac-x64 $(MFLAGS)"
@@ -311,10 +327,6 @@ docker-plugin-build-win-x64:
 docker-plugin-build-lin-x64:
 	mkdir -p $(PLUGIN_BUILD_DIR)
 	$(DOCKER_RUN) -c "$(MAKE) plugin-build-lin-x64 $(MFLAGS)"
-
-docker-plugin-build:
-	mkdir -p $(PLUGIN_BUILD_DIR)
-	$(DOCKER_RUN) -c "$(MAKE) plugin-build $(MFLAGS)"
 
 
 .NOTPARALLEL:
