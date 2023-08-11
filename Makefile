@@ -106,7 +106,7 @@ $(toolchain-mac):
 
 
 toolchain-clean:
-	rm -rf .build local osxcross $(rack-sdk-mac-x64) $(rack-sdk-win-x64) $(rack-sdk-lin-x64) $(rack-sdk-mac-arm64)
+	rm -rf local osxcross .build build.log .config
 
 
 # Rack SDK
