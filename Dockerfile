@@ -1,4 +1,4 @@
-FROM archlinux:base-20230709.0.163418
+FROM ubuntu:22.04
 ENV LANG C.UTF-8
 
 ARG JOBS
@@ -9,7 +9,7 @@ RUN useradd --create-home --uid 1000 --gid 1000 --shell /bin/bash build
 
 # Install make to run make
 ENV DEBIAN_FRONTEND=noninteractive
-RUN pacman -Suyy --noconfirm && pacman -S make --noconfirm
+RUN apt-get update && apt-get install -y --no-install-recommends make
 
 # Create toolchain directory
 USER build
@@ -20,10 +20,9 @@ COPY Makefile /home/build/rack-plugin-toolchain/
 
 # Install dependencies for building toolchains and plugins
 USER root
-RUN make dep-arch-linux
-
+RUN make dep-ubuntu
 # Clean up files to free up space
-RUN pacman -Sc --noconfirm
+RUN rm -rf /var/lib/apt/lists/*
 
 USER build
 COPY MacOSX11.1.sdk.tar.* /home/build/rack-plugin-toolchain/

@@ -17,7 +17,7 @@ export JOBS_CT_NG :=
 endif
 
 RACK_SDK_VERSION := 2.4.0
-DOCKER_IMAGE_VERSION := 10
+DOCKER_IMAGE_VERSION := 11
 
 
 all: toolchain-all rack-sdk-all
@@ -89,18 +89,21 @@ $(toolchain-mac):
 	cd osxcross && BINUTILS_VERSION=$(OSXCROSS_BINUTILS_VERSION) TARGET_DIR="$(LOCAL_DIR)/osxcross" JOBS=$(JOBS) ./build_binutils.sh
 	cd osxcross/build/build_stage && cmake . -DLLVM_BINUTILS_INCDIR=$(PWD)/osxcross/build/binutils-$(OSXCROSS_BINUTILS_VERSION)/include && make install -j $(JOBS)
 
+	# Fix library paths (for Arch Linux and Ubuntu arm64).
+	export PLATFORM_ID=$$($(LOCAL_DIR)/bin/clang -dumpmachine) ; \
+	echo "Platform ID: $$PLATFORM_ID" ; \
+	if [ ! -z "$$PLATFORM_ID" ] && [ -e "$(LOCAL_DIR)/lib/$$PLATFORM_ID/"  ]; then \
+		echo "Copying lib files..." ; \
+		cp -Pv $(LOCAL_DIR)/lib/$$PLATFORM_ID/* $(LOCAL_DIR)/lib/ ; \
+		echo "done" ; \
+	fi
+
 	## Download rcodesign binary to ad-hoc sign arm64 plugin builds in a cross-compilation environment.
 	wget --continue "https://github.com/indygreg/apple-platform-rs/releases/download/apple-codesign%2F0.22.0/apple-codesign-0.22.0-x86_64-unknown-linux-musl.tar.gz"
 	tar -xvf apple-codesign-0.22.0-x86_64-unknown-linux-musl.tar.gz
 	rm apple-codesign-0.22.0-x86_64-unknown-linux-musl.tar.gz
 	cp ./apple-codesign-0.22.0-x86_64-unknown-linux-musl/rcodesign $(LOCAL_DIR)/osxcross/bin/
 	rm -r apple-codesign-0.22.0-x86_64-unknown-linux-musl
-
-	# TODO Fix library paths.
-	# Background: clang build adds `x86_64-unknown-linux-gnu` on Arch,
-	# but cross-compilation environment for macOS platform does not expect it.
-	# As a result libcxx-abi.so.1 cannot be found.
-	cp $(LOCAL_DIR)/lib/x86_64-unknown-linux-gnu/* $(LOCAL_DIR)/lib/
 
 	rm -rf osxcross
 
@@ -291,7 +294,7 @@ dep-arch-linux:
 
 
 docker-build: rack-sdk-all
-	docker build --build-arg JOBS=$(JOBS) --tag rack-plugin-toolchain:$(DOCKER_IMAGE_VERSION) .
+	docker build --build-arg JOBS=$(JOBS) --no-cache --tag rack-plugin-toolchain:$(DOCKER_IMAGE_VERSION) . --progress=plain 2>&1 | tee docker-build.log
 
 
 DOCKER_RUN := docker run --rm --interactive --tty \
