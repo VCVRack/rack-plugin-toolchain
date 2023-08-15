@@ -1,6 +1,6 @@
-# VCV Rack plugin build toolchains
+# VCV Rack Plugin Toolchain
 
-**Cross-compile** Rack plugins for Apple macOS, Microsoft Windows, and GNU/Linux with a single command on any Linux distro.
+**Cross-compile** VCV Rack plugins for Mac, Windows, and Linux with a single command on any Linux distro.
 
 ## Building
 
