@@ -68,6 +68,11 @@ make -j8 docker-plugin-build PLUGIN_DIR=...
 ```
 You may replace 8 with your desired number of parallel jobs, such as your number of logical cores.
 
+**NOTE for macOS platform**: You may have to add `MAKE=make` to the build command on macOS.
+```bash
+MAKE=make make -j8 docker-plugin-build PLUGIN_DIR=...
+```
+
 Built plugin packages are placed in the `plugin-build/` directory.
 
 ### Rack SDK management
