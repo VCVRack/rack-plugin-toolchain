@@ -17,7 +17,7 @@ export JOBS_CT_NG :=
 endif
 
 RACK_SDK_VERSION := 2.4.0
-DOCKER_IMAGE_VERSION := 11
+DOCKER_IMAGE_VERSION := 12
 
 
 all: toolchain-all rack-sdk-all
@@ -182,6 +182,7 @@ plugin-build-mac-x64: export CXX := x86_64-apple-darwin20.2-clang++-libc++
 plugin-build-mac-x64: export STRIP := x86_64-apple-darwin20.2-strip
 plugin-build-mac-x64: export INSTALL_NAME_TOOL := x86_64-apple-darwin20.2-install_name_tool
 plugin-build-mac-x64: export OTOOL := x86_64-apple-darwin20.2-otool
+plugin-build-mac-x64: export CODESIGN := rcodesign sign
 
 
 plugin-build-mac-arm64: export PATH := $(LOCAL_DIR)/osxcross/bin:$(PATH)
