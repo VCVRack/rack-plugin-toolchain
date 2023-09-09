@@ -17,7 +17,7 @@ export JOBS_CT_NG :=
 endif
 
 RACK_SDK_VERSION := 2.4.1
-DOCKER_IMAGE_VERSION := 12
+DOCKER_IMAGE_VERSION := 13
 
 
 all: toolchain-all rack-sdk-all
@@ -198,12 +198,14 @@ plugin-build-win-x64: export PATH := $(LOCAL_DIR)/x86_64-w64-mingw32/bin:$(PATH)
 plugin-build-win-x64: export CC := x86_64-w64-mingw32-gcc
 plugin-build-win-x64: export CXX := x86_64-w64-mingw32-g++
 plugin-build-win-x64: export STRIP := x86_64-w64-mingw32-strip
+plugin-build-win-x64: export OBJCOPY := x86_64-w64-mingw32-objcopy
 
 
 plugin-build-lin-x64: export PATH:=$(LOCAL_DIR)/x86_64-ubuntu16.04-linux-gnu/bin:$(PATH)
 plugin-build-lin-x64: export CC := x86_64-ubuntu16.04-linux-gnu-gcc
 plugin-build-lin-x64: export CXX := x86_64-ubuntu16.04-linux-gnu-g++
 plugin-build-lin-x64: export STRIP := x86_64-ubuntu16.04-linux-gnu-strip
+plugin-build-lin-x64: export OBJCOPY := x86_64-ubuntu16.04-linux-gnu-objcopy
 
 
 plugin-build-mac-x64: export RACK_DIR := $(RACK_DIR_MAC_X64)
