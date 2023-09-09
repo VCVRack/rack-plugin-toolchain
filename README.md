@@ -68,12 +68,16 @@ make -j8 docker-plugin-build PLUGIN_DIR=...
 ```
 You may replace 8 with your desired number of parallel jobs, such as your number of logical cores.
 
-**NOTE for macOS platform**: You may have to add `MAKE=make` to the build command on macOS.
+Built plugin packages are placed in the `plugin-build/` directory.
+
+#### Notes for building and using the Docker-based toolchain on macOS
+
+- Ensure that Docker Desktop has sufficient amount of resources (RAM, disk space) allocated to build the toolchain!
+- You may have to add `MAKE=make` to the build command::
+
 ```bash
 MAKE=make make -j8 docker-plugin-build PLUGIN_DIR=...
 ```
-
-Built plugin packages are placed in the `plugin-build/` directory.
 
 ### Rack SDK management
 
@@ -81,7 +85,7 @@ The latest Rack SDKs for all supported platforms are downloaded during the toolc
 
 The SDKs can be updated to the latest version (defined in the `Makefile`) as follows:
 
-```
+```bash
 make rack-sdk-clean
 make rack-sdk-all
 ```
