@@ -1,6 +1,20 @@
 # VCV Rack Plugin Toolchain
 
-**Cross-compile** VCV Rack plugins for Mac, Windows, and Linux with a single command on any Linux distro.
+**Cross-compile** VCV Rack plugins for all supported platforms with a single command on any GNU/Linux-based distribution.
+
+## Supported platforms and architectures
+
+The following platforms and architectures are supported by the VCV Rack Plugin Toolchain:
+
+| Platform  | Architecture |
+|:---------:|:------------:|
+| GNU/Linux | x64          |
+| Windows   | x64          |
+| macOS     | x64, arm64   |
+
+All supported platforms and architectures will be built by **cross-compilation in a GNU/Linux-based environment**.
+
+Cross-platform support for using the toolchain on non-GNU/Linux platforms is provided via Docker (see below).
 
 ## Building
 
@@ -11,7 +25,7 @@ You must have access to a Mac computer with **Xcode 12.4** to generate this SDK 
 
 There are two ways to build the toolchains:
 - Locally on GNU/Linux: Uses your system's compilers to build the toolchains.
-- In a Docker container: This method uses an Arch Linux base image and installs all dependencies necessary to build the toolchains.
+- In a Docker container: This method uses a Ubuntu base image and installs all dependencies necessary to build the toolchains.
 
 **NOTE:** The official VCV Rack plugin build system is based on Arch Linux.
 
@@ -63,6 +77,7 @@ JOBS=8 make docker-build
 (`-j8` will not work due to the different build systems used in the toolchain build process.)
 
 Build your plugin.
+
 ```bash
 make -j8 docker-plugin-build PLUGIN_DIR=...
 ```
