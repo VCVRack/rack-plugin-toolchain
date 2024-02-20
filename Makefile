@@ -17,7 +17,7 @@ export JOBS_CT_NG :=
 endif
 
 RACK_SDK_VERSION := 2.4.1
-DOCKER_IMAGE_VERSION := 14
+DOCKER_IMAGE_VERSION := 13
 
 
 all: toolchain-all rack-sdk-all
@@ -299,48 +299,15 @@ dep-arch-linux:
 docker-build: rack-sdk-all
 	docker build --build-arg JOBS=$(JOBS) --no-cache --tag rack-plugin-toolchain:$(DOCKER_IMAGE_VERSION) . --progress=plain 2>&1 | tee docker-build.log
 
-#
-# For building in Docker containers we need to support two scenarios:
-#
-#  1. Building a plugin from a standalone git repository.
-#
-#  2. Building a plugin inside the Rack library repository.
-#
-#     In this case the plugin will be a GIT SUBMODULE!
-#
-#     If the plugin relies on git operations during the build process
-#     (for versioning information), the build process must have access
-#     to the git root directory, which, for the Rack library repo, is
-#     two levels above the plugin source directory.
-#
-# Therefore, we detect if the plugin source is in a git submodule and
-# adjust the build process accordingly to mount the correct path level
-# into the Docker container.
-#
-
-ifneq ($(PLUGIN_DIR),)
-# Normalize user-provided PLUGIN_DIR
-PLUGIN_DIR := $(shell realpath $(PLUGIN_DIR))
-# If PLUGIN_DIR is a git submodule, determine git versioned root directory
-PLUGIN_SOURCE_ROOT :=
-SUBMODULE_ROOT_DIR := $(shell cd $(PLUGIN_DIR) && git rev-parse --show-superproject-working-tree)
-ifeq ($(SUBMODULE_ROOT_DIR),)
-PLUGIN_SOURCE_ROOT := $(PLUGIN_DIR)
-else
-PLUGIN_SOURCE_ROOT := $(SUBMODULE_ROOT_DIR)
-endif
-# Get plugin directory relative to root, to adjust PLUGIN_DIR
-PLUGIN_DIR_RELATIVE := $(shell realpath -m --relative-to=$(PLUGIN_SOURCE_ROOT) $(PLUGIN_DIR))
-endif
 
 DOCKER_RUN := docker run --rm --interactive --tty \
-	--volume=$(PLUGIN_SOURCE_ROOT):/home/build/plugin-src \
+	--volume=$(PLUGIN_DIR):/home/build/plugin-src \
 	--volume=$(PWD)/$(PLUGIN_BUILD_DIR):/home/build/rack-plugin-toolchain/$(PLUGIN_BUILD_DIR) \
 	--volume=$(PWD)/Rack-SDK-mac-x64:/home/build/rack-plugin-toolchain/Rack-SDK-mac-x64 \
 	--volume=$(PWD)/Rack-SDK-mac-arm64:/home/build/rack-plugin-toolchain/Rack-SDK-mac-arm64 \
 	--volume=$(PWD)/Rack-SDK-win-x64:/home/build/rack-plugin-toolchain/Rack-SDK-win-x64 \
 	--volume=$(PWD)/Rack-SDK-lin-x64:/home/build/rack-plugin-toolchain/Rack-SDK-lin-x64 \
-	--env PLUGIN_DIR=/home/build/plugin-src/$(PLUGIN_DIR_RELATIVE) \
+	--env PLUGIN_DIR=/home/build/plugin-src \
 	rack-plugin-toolchain:$(DOCKER_IMAGE_VERSION) \
 	/bin/bash
 
