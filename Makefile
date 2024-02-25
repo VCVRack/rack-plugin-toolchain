@@ -17,7 +17,7 @@ export JOBS_CT_NG :=
 endif
 
 RACK_SDK_VERSION := 2.4.1
-DOCKER_IMAGE_VERSION := 13
+DOCKER_IMAGE_VERSION := 14
 
 
 all: toolchain-all rack-sdk-all
@@ -26,7 +26,7 @@ all: toolchain-all rack-sdk-all
 # Toolchain build
 
 
-toolchain-all: toolchain-lin toolchain-win toolchain-mac
+toolchain-all: toolchain-lin toolchain-win toolchain-mac toolchain-cppcheck
 
 
 crosstool-ng := $(LOCAL_DIR)/bin/ct-ng
@@ -106,6 +106,24 @@ $(toolchain-mac):
 	rm -r apple-codesign-0.22.0-x86_64-unknown-linux-musl
 
 	rm -rf osxcross
+
+
+CPPCHECK_VERSION := 2.13.0
+toolchain-cppcheck := $(LOCAL_DIR)/cppcheck/bin/cppcheck
+toolchain-cppcheck: $(toolchain-cppcheck)
+$(toolchain-cppcheck):
+	wget --continue "https://github.com/danmar/cppcheck/archive/refs/tags/$(CPPCHECK_VERSION).tar.gz"
+	tar xvf $(CPPCHECK_VERSION).tar.gz
+	cd cppcheck-$(CPPCHECK_VERSION) && mkdir build
+	cd cppcheck-$(CPPCHECK_VERSION)/build \
+		&& cmake .. \
+		-DUSE_MATCHCOMPILER=ON \
+		-DUSE_THREADS=ON \
+		-DCMAKE_INSTALL_PREFIX=$(LOCAL_DIR)/cppcheck \
+		&& cmake --build . -j \
+		&& cmake --install .
+	rm $(CPPCHECK_VERSION).tar.gz
+	rm -rf cppcheck-$(CPPCHECK_VERSION)
 
 
 toolchain-clean:
@@ -228,6 +246,16 @@ plugin-build-clean:
 	rm -rf $(PLUGIN_BUILD_DIR)
 
 
+# Static Analysis
+
+static-analysis-cppcheck: export PATH := $(LOCAL_DIR)/cppcheck/bin:$(PATH)
+static-analysis-cppcheck: toolchain-cppcheck
+	cd $(PLUGIN_DIR) && cppcheck src/ -isrc/dep --std=c++11 -j $(shell nproc) -q --error-exitcode=1 2>&1 | tee cppcheck-results.log
+
+
+plugin-analyze: static-analysis-cppcheck
+
+
 # Docker helpers
 
 
@@ -334,6 +362,9 @@ docker-plugin-build-lin-x64:
 	mkdir -p $(PLUGIN_BUILD_DIR)
 	$(DOCKER_RUN) -c "$(MAKE) plugin-build-lin-x64 $(MFLAGS)"
 
+docker-plugin-analyze:
+	$(DOCKER_RUN) -c "$(MAKE) plugin-analyze $(MFLAGS)"
+
 
 .NOTPARALLEL:
-.PHONY: all plugin-build
+.PHONY: all plugin-build plugin-analyze

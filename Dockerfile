@@ -31,5 +31,6 @@ COPY MacOSX11.1.sdk.tar.* /home/build/rack-plugin-toolchain/
 RUN JOBS=$JOBS make toolchain-mac
 RUN JOBS=$JOBS make toolchain-win
 RUN JOBS=$JOBS make toolchain-lin
+RUN JOBS=$JOBS make toolchain-cppcheck
 
 RUN rm MacOSX11.1.sdk.tar.*

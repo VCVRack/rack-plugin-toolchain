@@ -2,6 +2,8 @@
 
 **Cross-compile** VCV Rack plugins for all supported platforms with a single command on any GNU/Linux-based distribution.
 
+**Analyze** plugin source code using open source static analysis tools (for example: cppcheck).
+
 ## Supported platforms and architectures
 
 The following platforms and architectures are supported by the VCV Rack Plugin Toolchain:
@@ -57,6 +59,14 @@ make -j$(nproc) plugin-build PLUGIN_DIR=...
 
 Built plugin packages are placed in the `plugin-build/` directory.
 
+Analyze your plugin source code.
+
+```bash
+make -j$(nproc) plugin-analyze PLUGIN_DIR=...
+```
+
+Analysis results will be captured in a results file in the plugin source directory.
+
 ### Docker toolchain build
 
 *Works on any operating system with [Docker](https://www.docker.com/) installed.*
@@ -72,18 +82,26 @@ make docker-build
 
 *Optional*: Pass number of jobs to use to for the tool chain build with the `JOBS` environment variable.
 ```bash
-JOBS=8 make docker-build
+JOBS=$(nproc) make docker-build
 ```
-(`-j8` will not work due to the different build systems used in the toolchain build process.)
+(Just passing `-j$(nproc)` directly will not work due to the different build systems used in the toolchain build process.)
 
 Build your plugin.
 
+
 ```bash
-make -j8 docker-plugin-build PLUGIN_DIR=...
+make -j$(nproc) docker-plugin-build PLUGIN_DIR=...
 ```
-You may replace 8 with your desired number of parallel jobs, such as your number of logical cores.
 
 Built plugin packages are placed in the `plugin-build/` directory.
+
+Analyze plugin source code.
+
+```bash
+make -j$(nproc) docker-plugin-analyze PLUGIN_DIR=...
+```
+
+Analysis results will be captured in a results file in the plugin source directory.
 
 #### Notes for building and using the Docker-based toolchain on macOS
 
@@ -91,7 +109,7 @@ Built plugin packages are placed in the `plugin-build/` directory.
 - You may have to add `MAKE=make` to the build command::
 
 ```bash
-MAKE=make make -j8 docker-plugin-build PLUGIN_DIR=...
+MAKE=make make -j$(nproc) docker-plugin-build PLUGIN_DIR=...
 ```
 
 ### Rack SDK management
