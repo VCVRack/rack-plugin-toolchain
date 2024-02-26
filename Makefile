@@ -30,7 +30,7 @@ all: toolchain-all rack-sdk-all
 # Toolchain build
 
 
-toolchain-all: toolchain-lin toolchain-win toolchain-mac toolchain-cppcheck
+toolchain-all: toolchain-lin toolchain-win toolchain-mac cppcheck
 
 
 crosstool-ng := $(LOCAL_DIR)/bin/ct-ng
@@ -113,11 +113,11 @@ $(toolchain-mac):
 
 
 CPPCHECK_VERSION := 2.13.0
-toolchain-cppcheck := $(LOCAL_DIR)/cppcheck/bin/cppcheck
-toolchain-cppcheck: $(toolchain-cppcheck)
-$(toolchain-cppcheck):
-	wget --continue "https://github.com/danmar/cppcheck/archive/refs/tags/$(CPPCHECK_VERSION).tar.gz"
-	tar xvf $(CPPCHECK_VERSION).tar.gz
+cppcheck := $(LOCAL_DIR)/cppcheck/bin/cppcheck
+cppcheck: $(cppcheck)
+$(cppcheck):
+	$(WGET) "https://github.com/danmar/cppcheck/archive/refs/tags/$(CPPCHECK_VERSION).tar.gz"
+	$(UNTAR) $(CPPCHECK_VERSION).tar.gz
 	cd cppcheck-$(CPPCHECK_VERSION) && mkdir build
 	cd cppcheck-$(CPPCHECK_VERSION)/build \
 		&& cmake .. \
@@ -253,8 +253,8 @@ plugin-build-clean:
 # Static Analysis
 
 static-analysis-cppcheck: export PATH := $(LOCAL_DIR)/cppcheck/bin:$(PATH)
-static-analysis-cppcheck: toolchain-cppcheck
-	cd $(PLUGIN_DIR) && cppcheck src/ -isrc/dep --std=c++11 -j $(shell nproc) -q --error-exitcode=1 2>&1 | tee cppcheck-results.log
+static-analysis-cppcheck: cppcheck
+	cd $(PLUGIN_DIR) && cppcheck src/ -isrc/dep --std=c++11 -j $(shell nproc) --error-exitcode=1
 
 
 plugin-analyze: static-analysis-cppcheck

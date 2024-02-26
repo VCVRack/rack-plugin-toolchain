@@ -65,8 +65,6 @@ Analyze your plugin source code.
 make -j$(nproc) plugin-analyze PLUGIN_DIR=...
 ```
 
-Analysis results will be captured in a results file in the plugin source directory.
-
 ### Docker toolchain build
 
 *Works on any operating system with [Docker](https://www.docker.com/) installed.*
@@ -100,8 +98,6 @@ Analyze plugin source code.
 ```bash
 make -j$(nproc) docker-plugin-analyze PLUGIN_DIR=...
 ```
-
-Analysis results will be captured in a results file in the plugin source directory.
 
 #### Notes for building and using the Docker-based toolchain on macOS
 
