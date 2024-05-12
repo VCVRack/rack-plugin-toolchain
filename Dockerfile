@@ -1,11 +1,10 @@
-FROM ubuntu:22.04
+FROM ubuntu:24.04
 ENV LANG C.UTF-8
 
 ARG JOBS
 
 # Create unprivileged user to build toolchains and plugins
-RUN groupadd -g 1000 build
-RUN useradd --create-home --uid 1000 --gid 1000 --shell /bin/bash build
+RUN useradd --non-unique --create-home --uid 1000 --gid 1000 --shell /bin/bash build
 
 # Install make to run make
 ENV DEBIAN_FRONTEND=noninteractive

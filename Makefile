@@ -47,6 +47,16 @@ $(crosstool-ng):
 toolchain-lin := $(LOCAL_DIR)/x86_64-ubuntu16.04-linux-gnu
 toolchain-lin: $(toolchain-lin)
 $(toolchain-lin): $(crosstool-ng)
+	# Build a newer version of texinfo because version 7.1 in Ubuntu 24.04 has issues.
+	# This is needed to build glibc for the GNU/Linux based toolchain.
+	git clone https://git.savannah.gnu.org/git/texinfo.git
+	cd texinfo && git checkout 60d3edc4b74b4e1e5ef55e53de394d3b65506c47
+	cd texinfo && ./autogen.sh
+	cd texinfo && ./configure --prefix="$(LOCAL_DIR)"
+	cd texinfo && make -j $(JOBS)
+	cd texinfo && make install -j $(JOBS)
+	rm -rf texinfo
+
 	ct-ng x86_64-ubuntu16.04-linux-gnu
 	CT_PREFIX="$(LOCAL_DIR)" ct-ng build$(JOBS_CT_NG)
 	rm -rf .build .config build.log
@@ -114,7 +124,7 @@ $(toolchain-mac):
 	rm -rf osxcross
 
 
-CPPCHECK_VERSION := 2.13.0
+CPPCHECK_VERSION := 2.14.0
 cppcheck := $(LOCAL_DIR)/cppcheck/bin/cppcheck
 cppcheck: $(cppcheck)
 $(cppcheck):
@@ -302,7 +312,8 @@ dep-ubuntu:
 		coreutils \
 		zstd \
 		markdown \
-		libarchive-tools
+		libarchive-tools \
+		gettext
 
 
 dep-arch-linux:
