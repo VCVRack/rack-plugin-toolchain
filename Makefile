@@ -21,7 +21,7 @@ UNTAR := tar -x -f
 UNZIP := unzip
 
 RACK_SDK_VERSION := 2.5.2
-DOCKER_IMAGE_VERSION := 14
+DOCKER_IMAGE_VERSION := 15
 
 
 all: toolchain-all rack-sdk-all
@@ -47,8 +47,8 @@ $(crosstool-ng):
 toolchain-lin := $(LOCAL_DIR)/x86_64-ubuntu16.04-linux-gnu
 toolchain-lin: $(toolchain-lin)
 $(toolchain-lin): $(crosstool-ng)
-	# Build a newer version of texinfo because version 7.1 in Ubuntu 24.04 has issues.
-	# This is needed to build glibc for the GNU/Linux based toolchain.
+	# Build a newer version of texinfo because lastest released version 7.1 has a bug
+	# that prevents building glibc for the GNU/Linux based toolchain.
 	git clone https://git.savannah.gnu.org/git/texinfo.git
 	cd texinfo && git checkout 60d3edc4b74b4e1e5ef55e53de394d3b65506c47
 	cd texinfo && ./autogen.sh
@@ -73,7 +73,7 @@ toolchain-win: $(toolchain-win)
 $(toolchain-win): $(crosstool-ng)
 	ct-ng x86_64-w64-mingw32
 	CT_PREFIX="$(LOCAL_DIR)" ct-ng build$(JOBS_CT_NG)
-	rm -rf .build .config build.log /home/build/src
+	rm -rf .build .config build.log
 
 
 OSXCROSS_CLANG_VERSION := 15.0.7
@@ -84,9 +84,8 @@ toolchain-mac: $(toolchain-mac)
 $(toolchain-mac): export PATH := $(LOCAL_DIR)/osxcross/bin:$(PATH)
 $(toolchain-mac):
 	# Obtain osxcross sources.
-	# FIXME Use official osxcross version when workaround from our fork are not required anymore.
 	git clone "https://github.com/tpoechtrager/osxcross.git" osxcross
-	cd osxcross && git checkout ff8d100f3f026b4ffbe4ce96d8aac4ce06f1278b
+	cd osxcross && git checkout b8e6ccbaecd977edf6bb009f08c5c0b3ef72f805
 
 	# Build a custom clang compiler using the system's gcc compiler.
 	# This enables us to have custom compiler environment needed for cross-compilation.
@@ -101,9 +100,7 @@ $(toolchain-mac):
 
 	## Build MacOS binutils and build LLVM gold.
 	cd osxcross && BINUTILS_VERSION=$(OSXCROSS_BINUTILS_VERSION) TARGET_DIR="$(LOCAL_DIR)/osxcross" JOBS=$(JOBS) ./build_binutils.sh
-
-	# This doesn't seem to work anymore
-	#cd osxcross/build/build_stage && cmake . -DLLVM_BINUTILS_INCDIR=$(PWD)/osxcross/build/binutils-$(OSXCROSS_BINUTILS_VERSION)/include && make install -j $(JOBS)
+	cd osxcross/build/clang-$(OSXCROSS_CLANG_VERSION)/build_stage2 && cmake . -DLLVM_BINUTILS_INCDIR=$(PWD)/osxcross/build/binutils-$(OSXCROSS_BINUTILS_VERSION)/include && make install -j $(JOBS)
 
 	# Fix library paths (for Arch Linux and Ubuntu arm64).
 	export PLATFORM_ID=$$($(LOCAL_DIR)/bin/clang -dumpmachine) ; \
@@ -133,8 +130,8 @@ $(cppcheck):
 	cd cppcheck-$(CPPCHECK_VERSION) && mkdir build
 	cd cppcheck-$(CPPCHECK_VERSION)/build \
 		&& cmake .. \
-		-DUSE_MATCHCOMPILER=ON \
-		-DUSE_THREADS=ON \
+		-DUSE_MATCHCOMPILER=On \
+		-DUSE_THREADS=On \
 		-DCMAKE_INSTALL_PREFIX=$(LOCAL_DIR)/cppcheck \
 		&& cmake --build . -j \
 		&& cmake --install .
