@@ -273,8 +273,7 @@ plugin-analyze: static-analysis-cppcheck
 
 
 dep-ubuntu:
-	apt-get update
-	apt-get install -y --no-install-recommends \
+	sudo apt-get install --no-install-recommends \
 		ca-certificates \
 		git \
 		build-essential \
@@ -314,7 +313,7 @@ dep-ubuntu:
 
 
 dep-arch-linux:
-	pacman -Suyy --noconfirm && pacman -S --noconfirm --needed \
+	sudo pacman -S --needed \
 		gcc \
 		git \
 		cmake \

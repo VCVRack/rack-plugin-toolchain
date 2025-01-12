@@ -38,11 +38,13 @@ There are two ways to build the toolchains:
 Install toolchain build dependencies.
 On Arch Linux,
 ```bash
-sudo make dep-arch-linux
+sudo pacman -Syu
+make dep-arch-linux
 ```
 or on Ubuntu,
 ```bash
-sudo make dep-ubuntu
+sudo apt-get update
+make dep-ubuntu
 ```
 
 Build toolchains for all three platforms.
