@@ -2,6 +2,7 @@ FROM ubuntu:24.04
 ENV LANG C.UTF-8
 
 ARG JOBS
+ARG MACOS_SDK_VERSION
 
 # Install make and sudo to bootstrap
 ENV DEBIAN_FRONTEND=noninteractive
@@ -66,7 +67,7 @@ USER root
 RUN rm -rf /var/lib/apt/lists/*
 
 USER build
-COPY MacOSX11.1.sdk.tar.* /home/build/rack-plugin-toolchain/
+COPY MacOSX${MACOS_SDK_VERSION}.sdk.tar.* /home/build/rack-plugin-toolchain/
 
 # Build toolchains
 RUN JOBS=$JOBS make toolchain-mac
@@ -75,4 +76,4 @@ RUN JOBS=$JOBS make toolchain-lin
 
 RUN JOBS=$JOBS make cppcheck
 
-RUN rm MacOSX11.1.sdk.tar.*
+RUN rm MacOSX12.3.sdk.tar.*

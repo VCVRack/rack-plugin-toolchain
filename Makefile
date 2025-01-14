@@ -21,8 +21,10 @@ UNTAR := tar -x -f
 UNZIP := unzip
 
 RACK_SDK_VERSION := 2.5.2
-DOCKER_IMAGE_VERSION := 15
+DOCKER_IMAGE_VERSION := 16
 
+MACOS_SDK_VERSION := 12.3
+DARWIN_VERSION := 21.4
 
 all: toolchain-all rack-sdk-all
 
@@ -36,7 +38,7 @@ toolchain-all: toolchain-lin toolchain-win toolchain-mac cppcheck
 crosstool-ng := $(LOCAL_DIR)/bin/ct-ng
 $(crosstool-ng):
 	git clone https://github.com/crosstool-ng/crosstool-ng.git
-	cd crosstool-ng && git checkout e63c40854c977f488bee159a8f8ebf5fc06c8666
+	cd crosstool-ng && git checkout 32f288e61fee8528931bcd55bf106cf0cfb4e2a1
 	cd crosstool-ng && ./bootstrap
 	cd crosstool-ng && ./configure --prefix="$(LOCAL_DIR)"
 	cd crosstool-ng && make -j $(JOBS)
@@ -92,7 +94,7 @@ $(toolchain-mac):
 	cd osxcross && UNATTENDED=1 INSTALLPREFIX="$(LOCAL_DIR)" GITPROJECT=llvm CLANG_VERSION=$(OSXCROSS_CLANG_VERSION) OCDEBUG=1 ENABLE_CLANG_INSTALL=1 JOBS=$(JOBS) ./build_clang.sh
 
 	## Build osxcross.
-	cp MacOSX11.1.sdk.tar.* osxcross/tarballs/
+	cp MacOSX$(MACOS_SDK_VERSION).sdk.tar.* osxcross/tarballs/
 	cd osxcross && PATH="$(LOCAL_DIR)/bin:$(PATH)" UNATTENDED=1 TARGET_DIR="$(LOCAL_DIR)/osxcross" JOBS=$(JOBS) ./build.sh
 
 	## Build compiler-rt.
@@ -121,7 +123,7 @@ $(toolchain-mac):
 	rm -rf osxcross
 
 
-CPPCHECK_VERSION := 2.14.0
+CPPCHECK_VERSION := 2.16.0
 cppcheck := $(LOCAL_DIR)/cppcheck/bin/cppcheck
 cppcheck: $(cppcheck)
 $(cppcheck):
@@ -221,20 +223,20 @@ plugin-build-lin:
 
 
 plugin-build-mac-x64: export PATH := $(LOCAL_DIR)/osxcross/bin:$(PATH)
-plugin-build-mac-x64: export CC := x86_64-apple-darwin20.2-clang
-plugin-build-mac-x64: export CXX := x86_64-apple-darwin20.2-clang++-libc++
-plugin-build-mac-x64: export STRIP := x86_64-apple-darwin20.2-strip
-plugin-build-mac-x64: export INSTALL_NAME_TOOL := x86_64-apple-darwin20.2-install_name_tool
-plugin-build-mac-x64: export OTOOL := x86_64-apple-darwin20.2-otool
+plugin-build-mac-x64: export CC := x86_64-apple-darwin$(DARWIN_VERSION)-clang
+plugin-build-mac-x64: export CXX := x86_64-apple-darwin$(DARWIN_VERSION)-clang++-libc++
+plugin-build-mac-x64: export STRIP := x86_64-apple-darwin$(DARWIN_VERSION)-strip
+plugin-build-mac-x64: export INSTALL_NAME_TOOL := x86_64-apple-darwin$(DARWIN_VERSION)-install_name_tool
+plugin-build-mac-x64: export OTOOL := x86_64-apple-darwin$(DARWIN_VERSION)-otool
 plugin-build-mac-x64: export CODESIGN := rcodesign sign
 
 
 plugin-build-mac-arm64: export PATH := $(LOCAL_DIR)/osxcross/bin:$(PATH)
-plugin-build-mac-arm64: export CC := arm64-apple-darwin20.2-clang
-plugin-build-mac-arm64: export CXX := arm64-apple-darwin20.2-clang++-libc++
-plugin-build-mac-arm64: export STRIP := arm64-apple-darwin20.2-strip
-plugin-build-mac-arm64: export INSTALL_NAME_TOOL := arm64-apple-darwin20.2-install_name_tool
-plugin-build-mac-arm64: export OTOOL := arm64-apple-darwin20.2-otool
+plugin-build-mac-arm64: export CC := arm64-apple-darwin$(DARWIN_VERSION)-clang
+plugin-build-mac-arm64: export CXX := arm64-apple-darwin$(DARWIN_VERSION)-clang++-libc++
+plugin-build-mac-arm64: export STRIP := arm64-apple-darwin$(DARWIN_VERSION)-strip
+plugin-build-mac-arm64: export INSTALL_NAME_TOOL := arm64-apple-darwin$(DARWIN_VERSION)-install_name_tool
+plugin-build-mac-arm64: export OTOOL := arm64-apple-darwin$(DARWIN_VERSION)-otool
 plugin-build-mac-arm64: export CODESIGN := rcodesign sign
 
 
@@ -351,7 +353,7 @@ dep-arch-linux:
 
 
 docker-build: rack-sdk-all
-	docker build --build-arg JOBS=$(JOBS) --no-cache --tag rack-plugin-toolchain:$(DOCKER_IMAGE_VERSION) . --progress=plain 2>&1 | tee docker-build.log
+	docker build --build-arg JOBS=$(JOBS) --build-arg MACOS_SDK_VERSION=$(MACOS_SDK_VERSION) --no-cache --tag rack-plugin-toolchain:$(DOCKER_IMAGE_VERSION) . --progress=plain 2>&1 | tee docker-build.log
 
 
 DOCKER_RUN := docker run --rm --interactive --tty \
