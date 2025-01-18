@@ -5,7 +5,45 @@ ARG JOBS
 
 # Install make and sudo to bootstrap
 ENV DEBIAN_FRONTEND=noninteractive
-RUN apt-get update && apt-get install -y --no-install-recommends make sudo
+RUN apt-get update && apt-get install -y --no-install-recommends \
+        make \
+        sudo \
+		ca-certificates \
+		git \
+		build-essential \
+		autoconf \
+		automake \
+		bison \
+		flex \
+		gawk \
+		libtool-bin \
+		libncurses5-dev \
+		unzip \
+		zip \
+		jq \
+		libgl-dev \
+		libglu-dev \
+		git \
+		wget \
+		curl \
+		cmake \
+		nasm \
+		xz-utils \
+		file \
+		python3 \
+		libxml2-dev \
+		libssl-dev \
+		texinfo \
+		help2man \
+		libz-dev \
+		rsync \
+		xxd \
+		perl \
+		coreutils \
+		zstd \
+		markdown \
+		libarchive-tools \
+		gettext
 RUN echo "%sudo ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
 
 # Create unprivileged user to build toolchains and plugins
@@ -20,9 +58,6 @@ RUN mkdir -p /home/build/rack-plugin-toolchain
 WORKDIR /home/build/rack-plugin-toolchain
 
 COPY Makefile /home/build/rack-plugin-toolchain/
-
-# Install dependencies for building toolchains and plugins
-RUN make dep-ubuntu
 
 # Clean up files to free up space
 USER root

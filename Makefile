@@ -273,7 +273,7 @@ plugin-analyze: static-analysis-cppcheck
 
 
 dep-ubuntu:
-	sudo apt-get install --assume-yes --no-install-recommends \
+	sudo apt-get install --no-install-recommends \
 		ca-certificates \
 		git \
 		build-essential \
