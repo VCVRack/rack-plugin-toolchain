@@ -152,20 +152,20 @@ rack-sdk-all: rack-sdk-mac-x64 rack-sdk-mac-arm64 rack-sdk-win-x64 rack-sdk-lin-
 rack-sdk-mac-x64 := Rack-SDK-mac-x64
 rack-sdk-mac-x64: $(rack-sdk-mac-x64)
 $(rack-sdk-mac-x64):
-	$(WGET) "https://vcvrack.com/downloads/Rack-SDK-$(RACK_SDK_VERSION)-mac-x64+arm64.zip"
-	$(UNZIP) Rack-SDK-$(RACK_SDK_VERSION)-mac-x64+arm64.zip
+	$(WGET) "https://vcvrack.com/downloads/Rack-SDK-$(RACK_SDK_VERSION)-mac-x64.zip"
+	$(UNZIP) Rack-SDK-$(RACK_SDK_VERSION)-mac-x64.zip
 	mv Rack-SDK Rack-SDK-mac-x64
-	rm Rack-SDK-$(RACK_SDK_VERSION)-mac-x64+arm64.zip
+	rm Rack-SDK-$(RACK_SDK_VERSION)-mac-x64.zip
 RACK_DIR_MAC_X64 := $(PWD)/$(rack-sdk-mac-x64)
 
 
 rack-sdk-mac-arm64 := Rack-SDK-mac-arm64
 rack-sdk-mac-arm64: $(rack-sdk-mac-arm64)
 $(rack-sdk-mac-arm64):
-	$(WGET) "https://vcvrack.com/downloads/Rack-SDK-$(RACK_SDK_VERSION)-mac-x64+arm64.zip"
-	$(UNZIP) Rack-SDK-$(RACK_SDK_VERSION)-mac-x64+arm64.zip
+	$(WGET) "https://vcvrack.com/downloads/Rack-SDK-$(RACK_SDK_VERSION)-arm64.zip"
+	$(UNZIP) Rack-SDK-$(RACK_SDK_VERSION)-arm64.zip
 	mv Rack-SDK Rack-SDK-mac-arm64
-	rm Rack-SDK-$(RACK_SDK_VERSION)-mac-x64+arm64.zip
+	rm Rack-SDK-$(RACK_SDK_VERSION)-arm64.zip
 RACK_DIR_MAC_ARM64 := $(PWD)/$(rack-sdk-mac-arm64)
 
 
