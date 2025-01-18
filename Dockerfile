@@ -3,24 +3,29 @@ ENV LANG C.UTF-8
 
 ARG JOBS
 
+# Install make and sudo to bootstrap
+ENV DEBIAN_FRONTEND=noninteractive
+RUN apt-get update && apt-get install -y --no-install-recommends make sudo
+RUN echo "%sudo ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
+
 # Create unprivileged user to build toolchains and plugins
 RUN useradd --non-unique --create-home --uid 1000 --gid 1000 --shell /bin/bash build
+RUN usermod -aG sudo build
 
-# Install make to run make
-ENV DEBIAN_FRONTEND=noninteractive
-RUN apt-get update && apt-get install -y --no-install-recommends make
+# Switch user from root
+USER build
 
 # Create toolchain directory
-USER build
 RUN mkdir -p /home/build/rack-plugin-toolchain
 WORKDIR /home/build/rack-plugin-toolchain
 
 COPY Makefile /home/build/rack-plugin-toolchain/
 
 # Install dependencies for building toolchains and plugins
-USER root
 RUN make dep-ubuntu
+
 # Clean up files to free up space
+USER root
 RUN rm -rf /var/lib/apt/lists/*
 
 USER build
