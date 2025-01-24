@@ -207,6 +207,19 @@ plugin-build:
 	$(MAKE) plugin-build-lin-x64
 
 
+plugin-build-mac:
+	$(MAKE) plugin-build-mac-x64
+	$(MAKE) plugin-build-mac-arm64
+
+
+plugin-build-win:
+	$(MAKE) plugin-build-win-x64
+
+
+plugin-build-lin:
+	$(MAKE) plugin-build-lin-x64
+
+
 plugin-build-mac-x64: export PATH := $(LOCAL_DIR)/osxcross/bin:$(PATH)
 plugin-build-mac-x64: export CC := x86_64-apple-darwin20.2-clang
 plugin-build-mac-x64: export CXX := x86_64-apple-darwin20.2-clang++-libc++
