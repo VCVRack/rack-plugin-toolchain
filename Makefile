@@ -85,7 +85,7 @@ $(toolchain-mac): export PATH := $(LOCAL_DIR)/osxcross/bin:$(PATH)
 $(toolchain-mac):
 	# Obtain osxcross sources.
 	git clone "https://github.com/tpoechtrager/osxcross.git" osxcross
-	cd osxcross && git checkout b8e6ccbaecd977edf6bb009f08c5c0b3ef72f805
+	cd osxcross && git checkout 611675b5179c4a9a5e33eac6c376ed8f986bab21
 
 	# Build a custom clang compiler using the system's gcc compiler.
 	# This enables us to have custom compiler environment needed for cross-compilation.
