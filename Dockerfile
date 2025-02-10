@@ -43,7 +43,9 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 		zstd \
 		markdown \
 		libarchive-tools \
-		gettext
+		gettext \
+        libgmp-dev \
+        libmpfr-dev
 RUN echo "%sudo ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
 
 # Create unprivileged user to build toolchains and plugins
