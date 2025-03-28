@@ -22,8 +22,8 @@ Cross-platform support for using the toolchain on non-GNU/Linux platforms is pro
 
 Clone this repository in a **path without spaces**, or the Makefile will break.
 
-Obtain `MacOSX11.1.sdk.tar.xz` using the instructions at https://github.com/tpoechtrager/osxcross#packaging-the-sdk, and place it in the root of this repository.
-You must have access to a Mac computer with **Xcode 12.4** to generate this SDK package. You **must** use this specific SDK version to build the toolchains.
+Obtain `MacOSX12.3.sdk.tar.xz` using the instructions at https://github.com/tpoechtrager/osxcross#packaging-the-sdk, and place it in the root of this repository.
+You must have access to a Mac computer with **Xcode 13.3.1** to generate this SDK package. You **must** use this specific SDK version to build the toolchains.
 
 There are two ways to build the toolchains:
 - Locally on GNU/Linux: Uses your system's compilers to build the toolchains.
