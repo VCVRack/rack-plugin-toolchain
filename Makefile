@@ -20,7 +20,7 @@ WGET := wget --continue
 UNTAR := tar -x -f
 UNZIP := unzip
 
-RACK_SDK_VERSION := 2.5.2
+RACK_SDK_VERSION := 2.6.3
 DOCKER_IMAGE_VERSION := 16
 
 MACOS_SDK_VERSION := 12.3
