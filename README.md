@@ -18,12 +18,25 @@ All supported platforms and architectures will be built by **cross-compilation i
 
 Cross-platform support for using the toolchain on non-GNU/Linux platforms is provided via Docker (see below).
 
+## Obtain the macOS SDK 12.3
+
+You must use a Mac computer for this step.
+You must generate this exact SDK version to build the Rack plugin toolchain.
+
+Download [Xcode 14.0.1](https://developer.apple.com/services-account/download?path=/Developer_Tools/Xcode_14.0.1/Xcode_14.0.1.xip) and extract the .xip.
+
+Extract the macOS SDK with [osxcross](https://github.com/tpoechtrager/osxcross).
+```bash
+git clone https://github.com/tpoechtrager/osxcross.git
+cd osxcross/tools
+XCODEDIR=~/Downloads/Xcode.app ./gen_sdk_package.sh
+```
+This generates `MacOSX12.3.sdk.tar.xz` in the `osxcross/tools` folder.
+
 ## Building
 
 Clone this repository in a **path without spaces**, or the Makefile will break.
-
-Obtain `MacOSX12.3.sdk.tar.xz` using the instructions at https://github.com/tpoechtrager/osxcross#packaging-the-sdk, and place it in the root of this repository.
-You must have access to a Mac computer with Xcode 13.3.0–[13.4.1](https://developer.apple.com/services-account/download?path=/Developer_Tools/Xcode_13.4.1/Xcode_13.4.1.xip) or 14.0–[14.0.1](https://developer.apple.com/services-account/download?path=/Developer_Tools/Xcode_14.0.1/Xcode_14.0.1.xip) to generate this SDK package. You **must** use this specific SDK version to build the toolchains.
+Obtain `MacOSX12.3.sdk.tar.xz` above and place it in the root of this repository.
 
 There are two ways to build the toolchains:
 - Locally on GNU/Linux: Uses your system's compilers to build the toolchains.
