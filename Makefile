@@ -49,15 +49,13 @@ $(crosstool-ng):
 toolchain-lin := $(LOCAL_DIR)/x86_64-ubuntu16.04-linux-gnu
 toolchain-lin: $(toolchain-lin)
 $(toolchain-lin): $(crosstool-ng)
-	# Build a newer version of texinfo because lastest released version 7.1 has a bug
-	# that prevents building glibc for the GNU/Linux based toolchain.
-	git clone https://git.savannah.gnu.org/git/texinfo.git
-	cd texinfo && git checkout 60d3edc4b74b4e1e5ef55e53de394d3b65506c47
-	cd texinfo && ./autogen.sh
-	cd texinfo && ./configure --prefix="$(LOCAL_DIR)"
-	cd texinfo && make -j $(JOBS)
-	cd texinfo && make install -j $(JOBS)
-	rm -rf texinfo
+	$(WGET) "https://ftp.gnu.org/gnu/texinfo/texinfo-7.2.tar.gz"
+	$(UNTAR) texinfo-7.2.tar.gz
+	rm texinfo-7.2.tar.gz
+	cd texinfo-7.2 && ./configure --prefix="$(LOCAL_DIR)"
+	cd texinfo-7.2 && make -j $(JOBS)
+	cd texinfo-7.2 && make install -j $(JOBS)
+	rm -rf texinfo-7.2
 
 	ct-ng x86_64-ubuntu16.04-linux-gnu
 	CT_PREFIX="$(LOCAL_DIR)" ct-ng build$(JOBS_CT_NG)
