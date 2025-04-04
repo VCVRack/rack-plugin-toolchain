@@ -38,7 +38,7 @@ toolchain-all: toolchain-lin toolchain-win toolchain-mac cppcheck
 crosstool-ng := $(LOCAL_DIR)/bin/ct-ng
 $(crosstool-ng):
 	git clone https://github.com/crosstool-ng/crosstool-ng.git
-	cd crosstool-ng && git checkout 32f288e61fee8528931bcd55bf106cf0cfb4e2a1
+	cd crosstool-ng && git checkout 70c2b00ad79a0a21a48e5a0eedc9f91c374af21d
 	cd crosstool-ng && ./bootstrap
 	cd crosstool-ng && ./configure --prefix="$(LOCAL_DIR)"
 	cd crosstool-ng && make -j $(JOBS)
