@@ -16,10 +16,11 @@ export JOBS :=
 export JOBS_CT_NG :=
 endif
 
-WGET := wget --continue
+WGET := wget -c
 UNTAR := tar -x -f
 UNZIP := unzip
 
+CROSSTOOL_NG_VERSION := 1.27.0
 RACK_SDK_VERSION := 2.6.3
 DOCKER_IMAGE_VERSION := 16
 
@@ -37,13 +38,13 @@ toolchain-all: toolchain-lin toolchain-win toolchain-mac cppcheck
 
 crosstool-ng := $(LOCAL_DIR)/bin/ct-ng
 $(crosstool-ng):
-	git clone https://github.com/crosstool-ng/crosstool-ng.git
-	cd crosstool-ng && git checkout 70c2b00ad79a0a21a48e5a0eedc9f91c374af21d
-	cd crosstool-ng && ./bootstrap
-	cd crosstool-ng && ./configure --prefix="$(LOCAL_DIR)"
-	cd crosstool-ng && make -j $(JOBS)
-	cd crosstool-ng && make install -j $(JOBS)
-	rm -rf crosstool-ng
+	$(WGET) "http://crosstool-ng.org/download/crosstool-ng/crosstool-ng-$(CROSSTOOL_NG_VERSION).tar.bz2"
+	$(UNTAR) crosstool-ng-$(CROSSTOOL_NG_VERSION).tar.bz2
+	rm crosstool-ng-$(CROSSTOOL_NG_VERSION).tar.bz2
+	cd crosstool-ng-$(CROSSTOOL_NG_VERSION) && ./configure --prefix="$(LOCAL_DIR)"
+	cd crosstool-ng-$(CROSSTOOL_NG_VERSION) && make -j $(JOBS)
+	cd crosstool-ng-$(CROSSTOOL_NG_VERSION) && make install
+	rm -rf crosstool-ng-$(CROSSTOOL_NG_VERSION)
 
 
 toolchain-lin := $(LOCAL_DIR)/x86_64-ubuntu16.04-linux-gnu
