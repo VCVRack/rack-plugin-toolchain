@@ -1,7 +1,17 @@
-MacOSX*.sdk.tar.*
-local/
-plugin-build/
-Rack-SDK-*/
-osxcross/
+# Ignore all dotfiles except git dotfiles
+.*
+!.git*
+
+# File extensions
+*.xz
+*.bz2
+*.gz
 *.log
-.config*
+
+# Build target folders
+/local
+/plugin-build
+/osxcross
+/crosstool-ng-*
+/Rack-SDK-*
+/MacOSX*.sdk.tar.*
