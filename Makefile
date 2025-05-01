@@ -22,7 +22,7 @@ UNZIP := unzip
 SHA256 := sha256check() { echo "$$2  $$1" | sha256sum -c; }; sha256check
 
 CROSSTOOL_NG_VERSION := 1.27.0
-RACK_SDK_VERSION := 2.6.3
+RACK_SDK_VERSION := 2.6.4
 DOCKER_IMAGE_VERSION := 17
 
 MACOS_SDK_VERSION := 12.3
