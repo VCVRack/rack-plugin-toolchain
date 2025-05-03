@@ -76,4 +76,6 @@ RUN JOBS=$JOBS make toolchain-lin
 
 RUN JOBS=$JOBS make cppcheck
 
+RUN JOBS=$JOBS make rack-sdk-all
+
 RUN rm MacOSX12.3.sdk.tar.*
