@@ -67,6 +67,12 @@ make toolchain-all
 Each toolchain will take around an hour to build and will require network access, about 8 GB free RAM, and about 15 GB free disk space.
 The final disk space after building is about 3.7 GB.
 
+Get Rack SDKs.
+```bash
+make rack-sdk-all
+```
+The Rack SDK version is defined in the Makefile.
+
 Build your plugin.
 ```bash
 make -j$(nproc) plugin-build PLUGIN_DIR=...
