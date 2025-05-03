@@ -80,7 +80,7 @@ $(toolchain-win): $(crosstool-ng)
 	rm -rf .build .config build.log
 
 
-OSXCROSS_CLANG_VERSION := 15.0.7
+OSXCROSS_CLANG_VERSION := 20.1.1
 OSXCROSS_BINUTILS_VERSION := 2.37
 
 toolchain-mac := $(LOCAL_DIR)/osxcross
@@ -89,7 +89,7 @@ $(toolchain-mac): export PATH := $(LOCAL_DIR)/osxcross/bin:$(PATH)
 $(toolchain-mac):
 	# Obtain osxcross sources.
 	git clone "https://github.com/tpoechtrager/osxcross.git" osxcross
-	cd osxcross && git checkout 611675b5179c4a9a5e33eac6c376ed8f986bab21
+	cd osxcross && git checkout 4372d5560307c649af5dbbfa20b39199c9ef48be
 
 	# Build a custom clang compiler using the system's gcc compiler.
 	# This enables us to have custom compiler environment needed for cross-compilation.
