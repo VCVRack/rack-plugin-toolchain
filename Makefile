@@ -134,7 +134,7 @@ $(cppcheck):
 	cd cppcheck-$(CPPCHECK_VERSION) && mkdir build
 	cd cppcheck-$(CPPCHECK_VERSION)/build \
 		&& cmake .. \
-		-DUSE_MATCHCOMPILER=On \
+		-DCMAKE_BUILD_TYPE=Release -DUSE_MATCHCOMPILER=On \
 		-DUSE_THREADS=On \
 		-DCMAKE_INSTALL_PREFIX=$(LOCAL_DIR)/cppcheck \
 		&& cmake --build . -j \
@@ -282,7 +282,7 @@ plugin-build-clean:
 
 static-analysis-cppcheck: export PATH := $(LOCAL_DIR)/cppcheck/bin:$(PATH)
 static-analysis-cppcheck: cppcheck
-	cd $(PLUGIN_DIR) && cppcheck src/ -isrc/dep --std=c++11 -j $(shell nproc) --error-exitcode=1
+	cd $(PLUGIN_DIR) && cppcheck src/ -isrc/dep --std=c++11 -j $(shell nproc) --error-exitcode=1 --suppress=normalCheckLevelMaxBranches
 
 
 plugin-analyze: static-analysis-cppcheck
