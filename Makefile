@@ -231,6 +231,7 @@ plugin-build-mac-x64: export STRIP := x86_64-apple-darwin$(DARWIN_VERSION)-strip
 plugin-build-mac-x64: export INSTALL_NAME_TOOL := x86_64-apple-darwin$(DARWIN_VERSION)-install_name_tool
 plugin-build-mac-x64: export OTOOL := x86_64-apple-darwin$(DARWIN_VERSION)-otool
 plugin-build-mac-x64: export CODESIGN := rcodesign sign
+plugin-build-mac-x64: export NM := x86_64-apple-darwin$(DARWIN_VERSION)-nm
 
 
 plugin-build-mac-arm64: export PATH := $(LOCAL_DIR)/osxcross/bin:$(PATH)
@@ -240,6 +241,7 @@ plugin-build-mac-arm64: export STRIP := arm64-apple-darwin$(DARWIN_VERSION)-stri
 plugin-build-mac-arm64: export INSTALL_NAME_TOOL := arm64-apple-darwin$(DARWIN_VERSION)-install_name_tool
 plugin-build-mac-arm64: export OTOOL := arm64-apple-darwin$(DARWIN_VERSION)-otool
 plugin-build-mac-arm64: export CODESIGN := rcodesign sign
+plugin-build-mac-arm64: export NM := arm64-apple-darwin$(DARWIN_VERSION)-nm
 
 
 plugin-build-win-x64: export PATH := $(LOCAL_DIR)/x86_64-w64-mingw32/bin:$(PATH)
