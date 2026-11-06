@@ -59,23 +59,19 @@ $(toolchain-lin): $(crosstool-ng)
 	cd texinfo-7.2 && make install -j $(JOBS)
 	rm -rf texinfo-7.2
 
-	ct-ng x86_64-ubuntu16.04-linux-gnu
+	DEFCONFIG=linux.defconfig ct-ng defconfig
 	CT_PREFIX="$(LOCAL_DIR)" ct-ng build$(JOBS_CT_NG)
 	rm -rf .build .config build.log
 	# HACK Copy GL and related include dirs to toolchain sysroot
-	chmod +w $(toolchain-lin)/x86_64-ubuntu16.04-linux-gnu/sysroot/usr/include
 	cp -r /usr/include/GL $(toolchain-lin)/x86_64-ubuntu16.04-linux-gnu/sysroot/usr/include/
 	cp -r /usr/include/KHR $(toolchain-lin)/x86_64-ubuntu16.04-linux-gnu/sysroot/usr/include/
 	cp -r /usr/include/X11 $(toolchain-lin)/x86_64-ubuntu16.04-linux-gnu/sysroot/usr/include/
-	chmod -w $(toolchain-lin)/x86_64-ubuntu16.04-linux-gnu/sysroot/usr/include
 
 
 toolchain-win := $(LOCAL_DIR)/x86_64-w64-mingw32
 toolchain-win: $(toolchain-win)
 $(toolchain-win): $(crosstool-ng)
-	ct-ng x86_64-w64-mingw32
-	# I don't know how to set crosstool-ng variables from the command line
-	sed -i 's/CT_MINGW_W64_VERSION=.*/CT_MINGW_W64_VERSION="v10.0.0"/' .config
+	DEFCONFIG=windows.defconfig ct-ng defconfig
 	CT_PREFIX="$(LOCAL_DIR)" ct-ng build$(JOBS_CT_NG)
 	rm -rf .build .config build.log
 
